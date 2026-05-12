@@ -428,7 +428,7 @@ export async function exportFormatA(inspection: Inspection, draft: boolean): Pro
 
   // Photo annex
   if (figures.length > 0) {
-    await buildPhotoAnnex(ctx, figures, draft, totalBodyPages, totalPages)
+    await buildPhotoAnnex(ctx, figures, draft, totalBodyPages, totalPages, logoImage)
   }
 
   return ctx.doc.save()

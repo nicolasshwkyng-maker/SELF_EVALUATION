@@ -110,7 +110,15 @@ export function createEmptyInspection(): Inspection {
 export async function loadInspection(): Promise<Inspection | null> {
   const db = await getDB()
   const data = await db.get(INSPECTIONS_STORE, CURRENT_KEY)
-  return data ?? null
+  if (!data) return null
+  // Forward-compatible migration: fill any fields added after the initial save
+  const empty = createEmptyInspection()
+  return {
+    ...empty,
+    ...data,
+    contractMaintenance: data.contractMaintenance ?? empty.contractMaintenance,
+    signatures: data.signatures ?? empty.signatures,
+  }
 }
 
 export async function saveInspection(inspection: Inspection): Promise<void> {

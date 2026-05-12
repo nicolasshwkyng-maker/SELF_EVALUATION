@@ -38,7 +38,12 @@ export default function ContractSection() {
   const { inspection, update } = useInspection()
   if (!inspection) return null
 
-  const { contractMaintenance, signatures } = inspection
+  const contractMaintenance = inspection.contractMaintenance ?? { services: [] }
+  const signatures = inspection.signatures ?? {
+    maintenanceResponsibleName: '', maintenanceApproved: null,
+    qualityControlResponsibleName: '', qualityControlApproved: null,
+    qualityAssuranceName: '', qualityAssuranceApproved: null,
+  }
 
   const addService = () => update((prev) => ({
     ...prev,

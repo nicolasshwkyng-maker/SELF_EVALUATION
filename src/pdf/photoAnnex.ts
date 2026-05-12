@@ -1,4 +1,5 @@
 import { loadBlob } from '../db/indexeddb'
+import type { PDFImage } from 'pdf-lib'
 import type { PdfCtx } from './pdfHelpers'
 import {
   addPage, drawHeaderBox, drawSectionHeader, drawText, embedPhoto,
@@ -6,7 +7,7 @@ import {
 } from './pdfHelpers'
 import type { FigureEntry } from '../utils/figureNumbering'
 
-export async function buildPhotoAnnex(ctx: PdfCtx, figures: FigureEntry[], draft: boolean, pageOffset: number, totalPages: number) {
+export async function buildPhotoAnnex(ctx: PdfCtx, figures: FigureEntry[], draft: boolean, pageOffset: number, totalPages: number, logoImage?: PDFImage) {
   if (figures.length === 0) return
 
   let pageIndex = pageOffset
@@ -15,7 +16,7 @@ export async function buildPhotoAnnex(ctx: PdfCtx, figures: FigureEntry[], draft
   const drawAnnexPage = () => {
     const { page, y, setY } = addPage(ctx)
     pageIndex++
-    drawHeaderBox(page, ctx, pageIndex, totalPages)
+    drawHeaderBox(page, ctx, pageIndex, totalPages, logoImage)
     let curY = PAGE_H - MARGIN - 30
     curY = drawSectionHeader(page, ctx, curY, 'ANEXO FOTOGRAFICO / PHOTOGRAPHIC ANNEX')
     if (draft) drawDraftWatermark(page, ctx)
