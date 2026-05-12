@@ -72,17 +72,35 @@ export function drawHeaderBox(
     const logoY = headerY + (HEADER_H - drawH) / 2
     page.drawImage(logoImage, { x: logoX, y: logoY, width: drawW, height: drawH })
 
-    // Column 2 — title (navy)
+    // Column 2 — title (white bg, centered text; ES in black, EN in gray)
     const titleX = MARGIN + LOGO_COL_W
-    page.drawRectangle({ x: titleX, y: headerY, width: titleW, height: HEADER_H, color: COLORS.navyHeader })
-    page.drawText('MAINTENANCE CAPABILITIES EVALUATION FORMAT FOR SATENA SUPPORT WORKSHOPS /', {
-      x: titleX + 4, y: headerY + HEADER_H - 11, size: 5.5, font: bold, color: COLORS.white,
+    page.drawRectangle({ x: titleX, y: headerY, width: titleW, height: HEADER_H, color: COLORS.white, borderColor: COLORS.navyHeader, borderWidth: 0.5 })
+
+    const enLine = 'MAINTENANCE CAPABILITIES EVALUATION FORMAT FOR SATENA SUPPORT WORKSHOPS'
+    const esLine = 'FORMATO EVALUACION DE CAPACIDADES DE MANTENIMIENTO PARA TALLERES SATENA'
+    const codeLine = 'SAT-F743'
+    const titleSize = 5.5
+    const codeSize = 7
+    const grayText = rgb(0.45, 0.45, 0.45) as RGB
+
+    const enW = bold.widthOfTextAtSize(enLine, titleSize)
+    const esW = bold.widthOfTextAtSize(esLine, titleSize)
+    const codeW = bold.widthOfTextAtSize(codeLine, codeSize)
+
+    page.drawText(enLine, {
+      x: titleX + (titleW - enW) / 2,
+      y: headerY + HEADER_H - 10,
+      size: titleSize, font: bold, color: grayText,
     })
-    page.drawText('FORMATO EVALUACION DE CAPACIDADES DE MANTENIMIENTO PARA TALLERES SATENA', {
-      x: titleX + 4, y: headerY + HEADER_H - 19, size: 5.5, font: bold, color: COLORS.white,
+    page.drawText(esLine, {
+      x: titleX + (titleW - esW) / 2,
+      y: headerY + HEADER_H - 18,
+      size: titleSize, font: bold, color: COLORS.black,
     })
-    page.drawText('SAT-F743', {
-      x: titleX + 4, y: headerY + HEADER_H - 27, size: 6.5, font: bold, color: COLORS.white,
+    page.drawText(codeLine, {
+      x: titleX + (titleW - codeW) / 2,
+      y: headerY + HEADER_H - 28,
+      size: codeSize, font: bold, color: COLORS.black,
     })
   } else {
     // ── 2-column fallback (no logo) ─────────────────────────────────────────
