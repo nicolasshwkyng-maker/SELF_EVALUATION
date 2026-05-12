@@ -78,7 +78,7 @@ export function drawHeaderBox(
 
     const enLine = 'MAINTENANCE CAPABILITIES EVALUATION FORMAT FOR SATENA SUPPORT WORKSHOPS'
     const esLine = 'FORMATO EVALUACION DE CAPACIDADES DE MANTENIMIENTO PARA TALLERES SATENA'
-    const codeLine = 'SAT-F743'
+    const codeLine = ''
     const titleSize = 5.5
     const codeSize = 7
     const grayText = rgb(0.45, 0.45, 0.45) as RGB
