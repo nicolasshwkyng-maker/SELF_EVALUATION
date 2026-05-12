@@ -66,9 +66,8 @@ export default function SummarySection({ onSectionChange }: { onSectionChange: (
       const bytes = pdfFormat === 'A'
         ? await exportFormatA(inspection, draft)
         : await exportFormatB(inspection, draft)
-      const workshop = inspection.admin.workshopName.replace(/\s+/g, '') || 'Inspeccion'
-      const date = inspection.admin.requestDate || new Date().toISOString().slice(0, 10)
-      triggerPdfDownload(bytes, `SAT-F743_${workshop}_${date}.pdf`)
+      const partNumber = inspection.componentId.partNumber.trim() || 'SIN-PN'
+      triggerPdfDownload(bytes, `SAT-F743 - ${partNumber}.pdf`)
     } catch (e) {
       console.error('PDF export error:', e)
       alert('Error al exportar PDF. Inténtalo de nuevo.')

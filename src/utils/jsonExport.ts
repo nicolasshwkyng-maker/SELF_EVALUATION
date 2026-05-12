@@ -55,10 +55,9 @@ export async function exportToJson(inspection: Inspection): Promise<void> {
   const blob = new Blob([json], { type: 'application/json' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
-  const workshop = inspection.admin.workshopName.replace(/\s+/g, '') || 'Inspeccion'
-  const date = inspection.admin.requestDate || new Date().toISOString().slice(0, 10)
+  const partNumber = inspection.componentId.partNumber.trim() || 'SIN-PN'
   a.href = url
-  a.download = `SAT-F743_${workshop}_${date}.json`
+  a.download = `SAT-F743 - ${partNumber}.json`
   a.click()
   URL.revokeObjectURL(url)
 }

@@ -39,7 +39,7 @@ export default function Layout({ children, currentSection, onSectionChange }: Pr
             <div>
               <div className="text-xs font-bold tracking-widest text-slate-300 uppercase">CODE: SAT-F743</div>
               <div className="text-sm font-semibold leading-tight truncate max-w-[200px]">
-                {inspection?.admin.workshopName || t('appShort')}
+                {inspection?.componentId.partNumber || t('appShort')}
               </div>
             </div>
             <div className="flex items-center gap-2">
