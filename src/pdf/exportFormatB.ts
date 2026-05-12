@@ -1,8 +1,8 @@
 import type { Inspection } from '../types'
 import { loadBlob } from '../db/indexeddb'
 import {
-  createPdfCtx, addPage, drawSectionHeader, drawText, drawDraftWatermark, sanitize,
-  embedPhoto, MARGIN, CONTENT_W, PAGE_H, PAGE_W, COLORS,
+  createPdfCtx, addPage, drawSectionHeader, drawDraftWatermark, sanitize,
+  embedPhoto, MARGIN, CONTENT_W, PAGE_H, COLORS,
 } from './pdfHelpers'
 
 const LINE_H = 11
@@ -81,7 +81,6 @@ export async function exportFormatB(inspection: Inspection, draft: boolean): Pro
     const maxW = (CONTENT_W - 8) / 2
     const maxH = 110
     let col = 0
-    let rowTopY = y
 
     for (const photo of photoList) {
       const blob = await loadBlob(photo.blobKey)
@@ -90,7 +89,6 @@ export async function exportFormatB(inspection: Inspection, draft: boolean): Pro
       if (!emb) continue
 
       ensure(maxH + 20)
-      if (col === 0) rowTopY = y
 
       const px = MARGIN + col * (maxW + 8)
       const photoY = y - emb.h

@@ -359,7 +359,7 @@ export async function exportFormatA(inspection: Inspection, draft: boolean): Pro
 
   // Box 1: Maintenance Responsible
   p4.drawRectangle({ x: MARGIN, y: y - 60, width: sigW, height: 61, borderColor: COLORS.darkGray, borderWidth: 0.4, color: COLORS.white })
-  p4.drawRectangle({ x: MARGIN, y: y - 12, width: sigW, height: 13, color: COLORS.navy })
+  p4.drawRectangle({ x: MARGIN, y: y - 12, width: sigW, height: 13, color: COLORS.navyHeader })
   p4.drawText('MAINTENANCE RESPONSIBLE / RESPONSABLE DE MANTENIMIENTO', { x: MARGIN + 2, y: y - 9, size: 4.5, font: ctx.bold, color: COLORS.white })
   p4.drawText('NAME / NOMBRE:', { x: MARGIN + 2, y: y - 18, size: 5, font: ctx.bold, color: COLORS.black })
   p4.drawText(sanitize(inspection.signatures?.maintenanceResponsibleName ?? ''), { x: MARGIN + 2, y: y - 25, size: 6, font: ctx.regular, color: COLORS.black })
@@ -376,7 +376,7 @@ export async function exportFormatA(inspection: Inspection, draft: boolean): Pro
 
   // Box 2: Quality Control Responsible
   p4.drawRectangle({ x: sig2x, y: y - 60, width: sigW, height: 61, borderColor: COLORS.darkGray, borderWidth: 0.4, color: COLORS.white })
-  p4.drawRectangle({ x: sig2x, y: y - 12, width: sigW, height: 13, color: COLORS.navy })
+  p4.drawRectangle({ x: sig2x, y: y - 12, width: sigW, height: 13, color: COLORS.navyHeader })
   p4.drawText('QUALITY CONTROL RESPONSIBLE / RESPONSABLE DE CALIDAD', { x: sig2x + 2, y: y - 9, size: 4.5, font: ctx.bold, color: COLORS.white })
   p4.drawText('NAME / NOMBRE:', { x: sig2x + 2, y: y - 18, size: 5, font: ctx.bold, color: COLORS.black })
   p4.drawText(sanitize(inspection.signatures?.qualityControlResponsibleName ?? ''), { x: sig2x + 2, y: y - 25, size: 6, font: ctx.regular, color: COLORS.black })
@@ -394,7 +394,7 @@ export async function exportFormatA(inspection: Inspection, draft: boolean): Pro
   // Quality Assurance audit box (full width)
   y -= 4
   p4.drawRectangle({ x: MARGIN, y: y - 80, width: CONTENT_W, height: 81, borderColor: COLORS.darkGray, borderWidth: 0.4, color: COLORS.white })
-  p4.drawRectangle({ x: MARGIN, y: y - 14, width: CONTENT_W, height: 15, color: COLORS.navy })
+  p4.drawRectangle({ x: MARGIN, y: y - 14, width: CONTENT_W, height: 15, color: COLORS.navyHeader })
   p4.drawText('9. AUDIT BY QUALITY ASSURANCE / AUDITORIA POR ASEGURAMIENTO DE CALIDAD', { x: MARGIN + 3, y: y - 10, size: 5.5, font: ctx.bold, color: COLORS.white })
   p4.drawText('NAME / NOMBRE:', { x: MARGIN + 3, y: y - 22, size: 5.5, font: ctx.bold, color: COLORS.black })
   p4.drawText(sanitize(inspection.signatures?.qualityAssuranceName ?? ''), { x: MARGIN + 70, y: y - 22, size: 6, font: ctx.regular, color: COLORS.black })

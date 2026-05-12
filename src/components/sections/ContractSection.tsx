@@ -1,5 +1,4 @@
 import { Trash2, PlusCircle } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
 import { v4 as uuidv4 } from 'uuid'
 import { useInspection } from '../../context/InspectionContext'
 import ComplianceToggle from '../ComplianceToggle'
@@ -11,7 +10,6 @@ function ServiceRow({ row, index, onChange, onDelete }: {
   onChange: (r: ContractMaintenanceService) => void
   onDelete: () => void
 }) {
-  const { t } = useTranslation()
   return (
     <div className="flex gap-2 items-center">
       <span className="text-xs text-gray-400 w-5 shrink-0">{index + 1}</span>
@@ -37,7 +35,6 @@ function ServiceRow({ row, index, onChange, onDelete }: {
 }
 
 export default function ContractSection() {
-  const { t } = useTranslation()
   const { inspection, update } = useInspection()
   if (!inspection) return null
 
