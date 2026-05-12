@@ -16,10 +16,22 @@ function formatDate(iso: string): string {
   }
 }
 
+async function loadLogoImage(ctx: import('./pdfHelpers').PdfCtx) {
+  try {
+    const res = await fetch('/satena-logo.png')
+    if (!res.ok) return undefined
+    const buf = await res.arrayBuffer()
+    return await ctx.doc.embedPng(new Uint8Array(buf))
+  } catch {
+    return undefined
+  }
+}
+
 // Two-pass: first build content pages, then inject page numbers
 export async function exportFormatA(inspection: Inspection, draft: boolean): Promise<Uint8Array> {
   const ctx = await createPdfCtx()
   const figures = buildFigureMap(inspection)
+  const logoImage = await loadLogoImage(ctx)
 
   // ── PAGE 1 ──────────────────────────────────────────────────────────────
   const { page: p1, setY: sy1 } = addPage(ctx)
@@ -408,9 +420,9 @@ export async function exportFormatA(inspection: Inspection, draft: boolean): Pro
   const annexPages = Math.ceil(totalPhotos / 2)
   const totalPages = totalBodyPages + annexPages
 
-  // Draw headers now that we know total
+  // Draw headers now that we know total (logo only in Format A)
   ;[p1, p2, p3, p4].forEach((pg, i) => {
-    drawHeaderBox(pg, ctx, i + 1, totalPages)
+    drawHeaderBox(pg, ctx, i + 1, totalPages, logoImage)
     if (draft) drawDraftWatermark(pg, ctx)
   })
 

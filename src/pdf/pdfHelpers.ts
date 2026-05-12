@@ -1,4 +1,4 @@
-import { PDFDocument, PDFPage, rgb, degrees, StandardFonts, type PDFFont, type RGB } from 'pdf-lib'
+import { PDFDocument, PDFPage, PDFImage, rgb, degrees, StandardFonts, type PDFFont, type RGB } from 'pdf-lib'
 import type { ComplianceStatus } from '../types'
 
 export const COLORS = {
@@ -40,28 +40,71 @@ export function addPage(ctx: PdfCtx): { page: PDFPage; y: () => number; setY: (v
   }
 }
 
-export function drawHeaderBox(page: PDFPage, ctx: PdfCtx, pageNum: number, totalPages: number) {
-  const { bold, regular } = ctx
-  // Main title box
-  page.drawRectangle({ x: MARGIN, y: PAGE_H - MARGIN - 28, width: CONTENT_W - 110, height: 28, color: COLORS.navyHeader })
-  page.drawText('MAINTENANCE CAPABILITIES EVALUATION FORMAT FOR SATENA SUPPORT WORKSHOPS / FORMATO EVALUACIÓN DE', {
-    x: MARGIN + 4, y: PAGE_H - MARGIN - 14, size: 5.5, font: bold, color: COLORS.white,
-  })
-  page.drawText('CAPACIDADES DE MANTENIMIENTO PARA TALLERES DE TRABAJO SATENA', {
-    x: MARGIN + 4, y: PAGE_H - MARGIN - 22, size: 5.5, font: bold, color: COLORS.white,
-  })
+const LOGO_COL_W = 72  // width of the logo column when a logo is present
+const CODE_COL_W = 110 // width of the document-control column (right)
+const HEADER_H = 32    // header height (slightly taller to fit logo proportionally)
 
-  // Code box
-  const codeX = PAGE_W - MARGIN - 110
-  page.drawRectangle({ x: codeX, y: PAGE_H - MARGIN - 28, width: 110, height: 28, color: COLORS.lightGray })
+export function drawHeaderBox(
+  page: PDFPage,
+  ctx: PdfCtx,
+  pageNum: number,
+  totalPages: number,
+  logoImage?: PDFImage,
+) {
+  const { bold, regular } = ctx
+  const headerY = PAGE_H - MARGIN - HEADER_H
+  const codeX = PAGE_W - MARGIN - CODE_COL_W
+
+  if (logoImage) {
+    // ── 3-column layout: [logo | title | code] ──────────────────────────────
+    const titleW = CONTENT_W - LOGO_COL_W - CODE_COL_W
+
+    // Column 1 — logo (white background, bordered)
+    page.drawRectangle({ x: MARGIN, y: headerY, width: LOGO_COL_W, height: HEADER_H, color: COLORS.white, borderColor: COLORS.navyHeader, borderWidth: 0.5 })
+    // Scale logo to fit within the column keeping aspect ratio, with 3pt padding
+    const { width: imgW, height: imgH } = logoImage.size()
+    const scaleW = (LOGO_COL_W - 6) / imgW
+    const scaleH = (HEADER_H - 6) / imgH
+    const scale = Math.min(scaleW, scaleH)
+    const drawW = imgW * scale
+    const drawH = imgH * scale
+    const logoX = MARGIN + (LOGO_COL_W - drawW) / 2
+    const logoY = headerY + (HEADER_H - drawH) / 2
+    page.drawImage(logoImage, { x: logoX, y: logoY, width: drawW, height: drawH })
+
+    // Column 2 — title (navy)
+    const titleX = MARGIN + LOGO_COL_W
+    page.drawRectangle({ x: titleX, y: headerY, width: titleW, height: HEADER_H, color: COLORS.navyHeader })
+    page.drawText('MAINTENANCE CAPABILITIES EVALUATION FORMAT FOR SATENA SUPPORT WORKSHOPS /', {
+      x: titleX + 4, y: headerY + HEADER_H - 11, size: 5.5, font: bold, color: COLORS.white,
+    })
+    page.drawText('FORMATO EVALUACION DE CAPACIDADES DE MANTENIMIENTO PARA TALLERES SATENA', {
+      x: titleX + 4, y: headerY + HEADER_H - 19, size: 5.5, font: bold, color: COLORS.white,
+    })
+    page.drawText('SAT-F743', {
+      x: titleX + 4, y: headerY + HEADER_H - 27, size: 6.5, font: bold, color: COLORS.white,
+    })
+  } else {
+    // ── 2-column fallback (no logo) ─────────────────────────────────────────
+    page.drawRectangle({ x: MARGIN, y: headerY, width: CONTENT_W - CODE_COL_W, height: HEADER_H, color: COLORS.navyHeader })
+    page.drawText('MAINTENANCE CAPABILITIES EVALUATION FORMAT FOR SATENA SUPPORT WORKSHOPS / FORMATO EVALUACION DE', {
+      x: MARGIN + 4, y: headerY + HEADER_H - 12, size: 5.5, font: bold, color: COLORS.white,
+    })
+    page.drawText('CAPACIDADES DE MANTENIMIENTO PARA TALLERES DE TRABAJO SATENA', {
+      x: MARGIN + 4, y: headerY + HEADER_H - 20, size: 5.5, font: bold, color: COLORS.white,
+    })
+  }
+
+  // Column 3 — document control (light gray, always present)
+  page.drawRectangle({ x: codeX, y: headerY, width: CODE_COL_W, height: HEADER_H, color: COLORS.lightGray, borderColor: COLORS.navyHeader, borderWidth: 0.5 })
   const codeLines = [
-    `CODE: SAT-F743`,
-    `FROM: 1/04/2025`,
-    `VERSION: 1`,
+    'CODE: SAT-F743',
+    'FROM: 01/04/2025',
+    'VERSION: 1',
     `PAGE: ${pageNum} OF ${totalPages}`,
   ]
   codeLines.forEach((line, i) => {
-    page.drawText(line, { x: codeX + 4, y: PAGE_H - MARGIN - 8 - i * 5.5, size: 5, font: regular, color: COLORS.black })
+    page.drawText(line, { x: codeX + 4, y: headerY + HEADER_H - 9 - i * 6, size: 5.5, font: regular, color: COLORS.black })
   })
 }
 
