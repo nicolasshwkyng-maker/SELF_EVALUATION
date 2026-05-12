@@ -11,23 +11,23 @@ function ServiceRow({ row, index, onChange, onDelete }: {
   onDelete: () => void
 }) {
   return (
-    <div className="flex gap-2 items-center">
-      <span className="text-xs text-gray-400 w-5 shrink-0">{index + 1}</span>
+    <div className="grid grid-cols-[1.25rem_1fr_1fr_1.75rem] gap-1.5 items-center w-full">
+      <span className="text-xs text-gray-400 text-center">{index + 1}</span>
       <input
         type="text"
         value={row.serviceType}
         onChange={(e) => onChange({ ...row, serviceType: e.target.value })}
-        placeholder="Tipo de servicio / Service type"
-        className="flex-1 border border-gray-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+        placeholder="Servicio / Service"
+        className="min-w-0 border border-gray-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
       />
       <input
         type="text"
         value={row.standard}
         onChange={(e) => onChange({ ...row, standard: e.target.value })}
-        placeholder="Norma / Standard"
-        className="flex-1 border border-gray-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+        placeholder="Norma / Std"
+        className="min-w-0 border border-gray-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
       />
-      <button type="button" onClick={onDelete} className="text-red-500 hover:text-red-700 p-1 shrink-0">
+      <button type="button" onClick={onDelete} className="text-red-500 hover:text-red-700 p-1">
         <Trash2 className="w-4 h-4" />
       </button>
     </div>
@@ -81,9 +81,11 @@ export default function ContractSection() {
           9. Contract Maintenance / Mantenimiento Contratado
         </h2>
         <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
-          <div className="grid grid-cols-2 gap-2 mb-1">
-            <span className="text-xs font-bold text-gray-500 uppercase">Tipo de Servicios / Service Type</span>
-            <span className="text-xs font-bold text-gray-500 uppercase">Norma / Standard</span>
+          <div className="grid grid-cols-[1.25rem_1fr_1fr_1.75rem] gap-1.5 mb-1">
+            <span />
+            <span className="text-xs font-bold text-gray-500 uppercase">Servicio / Service</span>
+            <span className="text-xs font-bold text-gray-500 uppercase">Norma / Std</span>
+            <span />
           </div>
           <div className="space-y-2">
             {contractMaintenance.services.map((row, i) => (

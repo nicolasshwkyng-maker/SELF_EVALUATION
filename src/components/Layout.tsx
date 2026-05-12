@@ -55,7 +55,7 @@ export default function Layout({ children, currentSection, onSectionChange }: Pr
 
       {/* Section nav */}
       <nav className="bg-slate-800 text-white overflow-x-auto">
-        <div className="max-w-3xl mx-auto flex">
+        <div className="flex w-max min-w-full">
           {NAV_KEYS.map((key, i) => (
             <button
               key={i}
