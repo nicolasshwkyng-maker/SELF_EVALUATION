@@ -301,6 +301,107 @@ export async function exportFormatA(inspection: Inspection, draft: boolean): Pro
 
   sy3(y)
 
+  // ── PAGE 4 ──────────────────────────────────────────────────────────────
+  const { page: p4, setY: sy4 } = addPage(ctx)
+  y = PAGE_H - MARGIN - 30
+
+  // Section 9 — Contract Maintenance
+  y = drawSectionHeader(p4, ctx, y, '9. CONTRACT MAINTENANCE / MANTENIMIENTO CONTRATADO')
+  y -= 2
+
+  const ctSvc = MARGIN
+  const ctStd = MARGIN + CONTENT_W * 0.55
+
+  p4.drawRectangle({ x: MARGIN, y: y - 11, width: CONTENT_W, height: 12, color: COLORS.lightGray })
+  p4.drawText('SERVICE TYPE / TIPO DE SERVICIO', { x: ctSvc + 2, y: y - 8, size: 5.5, font: ctx.bold, color: COLORS.black })
+  p4.drawText('STANDARD / ESTANDAR', { x: ctStd + 2, y: y - 8, size: 5.5, font: ctx.bold, color: COLORS.black })
+  y -= 13
+
+  const services = inspection.contractMaintenance?.services ?? []
+  if (services.length === 0) {
+    p4.drawRectangle({ x: MARGIN, y: y - 9, width: CONTENT_W, height: 9, borderColor: COLORS.darkGray, borderWidth: 0.2, color: COLORS.white })
+    p4.drawText('N/A', { x: MARGIN + 3, y: y - 6.5, size: 5.5, font: ctx.regular, color: COLORS.black })
+    y -= 9
+  } else {
+    for (const svc of services) {
+      const rowH = 9
+      if (y - rowH < MARGIN + 40) break
+      p4.drawRectangle({ x: MARGIN, y: y - rowH, width: CONTENT_W, height: rowH, borderColor: COLORS.darkGray, borderWidth: 0.2, color: COLORS.white })
+      p4.drawText(sanitize(svc.serviceType.slice(0, 45)), { x: ctSvc + 2, y: y - 6.5, size: 5.5, font: ctx.regular, color: COLORS.black })
+      p4.drawText(sanitize(svc.standard.slice(0, 35)), { x: ctStd + 2, y: y - 6.5, size: 5.5, font: ctx.regular, color: COLORS.black })
+      y -= rowH
+    }
+  }
+  y -= 4
+
+  // NDT note box
+  const ndtNote = 'NOTE: If the company has NDT capabilities these must be included in the scope of the SAT-F743 evaluation. / NOTA: Si la empresa tiene capacidades de NDT estas deben ser incluidas en el alcance de la evaluacion SAT-F743.'
+  p4.drawRectangle({ x: MARGIN, y: y - 22, width: CONTENT_W, height: 23, color: COLORS.lightGray, borderColor: COLORS.darkGray, borderWidth: 0.3 })
+  drawText(p4, ndtNote, MARGIN + 3, y - 4, 5, ctx.regular, COLORS.black, CONTENT_W - 6)
+  y -= 28
+
+  // Signature boxes — row 1: Maintenance Responsible + Quality Control
+  y -= 4
+  const sigW = (CONTENT_W - 8) / 2
+  const sig2x = MARGIN + sigW + 8
+
+  // Box 1: Maintenance Responsible
+  p4.drawRectangle({ x: MARGIN, y: y - 60, width: sigW, height: 61, borderColor: COLORS.darkGray, borderWidth: 0.4, color: COLORS.white })
+  p4.drawRectangle({ x: MARGIN, y: y - 12, width: sigW, height: 13, color: COLORS.navy })
+  p4.drawText('MAINTENANCE RESPONSIBLE / RESPONSABLE DE MANTENIMIENTO', { x: MARGIN + 2, y: y - 9, size: 4.5, font: ctx.bold, color: COLORS.white })
+  p4.drawText('NAME / NOMBRE:', { x: MARGIN + 2, y: y - 18, size: 5, font: ctx.bold, color: COLORS.black })
+  p4.drawText(sanitize(inspection.signatures?.maintenanceResponsibleName ?? ''), { x: MARGIN + 2, y: y - 25, size: 6, font: ctx.regular, color: COLORS.black })
+  p4.drawText('APPROVED / APROBADO:', { x: MARGIN + 2, y: y - 34, size: 5, font: ctx.bold, color: COLORS.black })
+  // YES checkbox
+  p4.drawRectangle({ x: MARGIN + 2, y: y - 48, width: 8, height: 8, borderColor: COLORS.darkGray, borderWidth: 0.5, color: COLORS.white })
+  if (inspection.signatures?.maintenanceApproved === 'yes') p4.drawText('X', { x: MARGIN + 4, y: y - 46, size: 7, font: ctx.bold, color: COLORS.black })
+  p4.drawText('YES / SI', { x: MARGIN + 12, y: y - 46, size: 5.5, font: ctx.regular, color: COLORS.black })
+  // NO checkbox
+  p4.drawRectangle({ x: MARGIN + 35, y: y - 48, width: 8, height: 8, borderColor: COLORS.darkGray, borderWidth: 0.5, color: COLORS.white })
+  if (inspection.signatures?.maintenanceApproved === 'no') p4.drawText('X', { x: MARGIN + 37, y: y - 46, size: 7, font: ctx.bold, color: COLORS.black })
+  p4.drawText('NO / NO', { x: MARGIN + 45, y: y - 46, size: 5.5, font: ctx.regular, color: COLORS.black })
+  p4.drawText('SIGNATURE / FIRMA:', { x: MARGIN + 2, y: y - 56, size: 5, font: ctx.bold, color: COLORS.black })
+
+  // Box 2: Quality Control Responsible
+  p4.drawRectangle({ x: sig2x, y: y - 60, width: sigW, height: 61, borderColor: COLORS.darkGray, borderWidth: 0.4, color: COLORS.white })
+  p4.drawRectangle({ x: sig2x, y: y - 12, width: sigW, height: 13, color: COLORS.navy })
+  p4.drawText('QUALITY CONTROL RESPONSIBLE / RESPONSABLE DE CALIDAD', { x: sig2x + 2, y: y - 9, size: 4.5, font: ctx.bold, color: COLORS.white })
+  p4.drawText('NAME / NOMBRE:', { x: sig2x + 2, y: y - 18, size: 5, font: ctx.bold, color: COLORS.black })
+  p4.drawText(sanitize(inspection.signatures?.qualityControlResponsibleName ?? ''), { x: sig2x + 2, y: y - 25, size: 6, font: ctx.regular, color: COLORS.black })
+  p4.drawText('APPROVED / APROBADO:', { x: sig2x + 2, y: y - 34, size: 5, font: ctx.bold, color: COLORS.black })
+  p4.drawRectangle({ x: sig2x + 2, y: y - 48, width: 8, height: 8, borderColor: COLORS.darkGray, borderWidth: 0.5, color: COLORS.white })
+  if (inspection.signatures?.qualityControlApproved === 'yes') p4.drawText('X', { x: sig2x + 4, y: y - 46, size: 7, font: ctx.bold, color: COLORS.black })
+  p4.drawText('YES / SI', { x: sig2x + 12, y: y - 46, size: 5.5, font: ctx.regular, color: COLORS.black })
+  p4.drawRectangle({ x: sig2x + 35, y: y - 48, width: 8, height: 8, borderColor: COLORS.darkGray, borderWidth: 0.5, color: COLORS.white })
+  if (inspection.signatures?.qualityControlApproved === 'no') p4.drawText('X', { x: sig2x + 37, y: y - 46, size: 7, font: ctx.bold, color: COLORS.black })
+  p4.drawText('NO / NO', { x: sig2x + 45, y: y - 46, size: 5.5, font: ctx.regular, color: COLORS.black })
+  p4.drawText('SIGNATURE / FIRMA:', { x: sig2x + 2, y: y - 56, size: 5, font: ctx.bold, color: COLORS.black })
+
+  y -= 68
+
+  // Quality Assurance audit box (full width)
+  y -= 4
+  p4.drawRectangle({ x: MARGIN, y: y - 80, width: CONTENT_W, height: 81, borderColor: COLORS.darkGray, borderWidth: 0.4, color: COLORS.white })
+  p4.drawRectangle({ x: MARGIN, y: y - 14, width: CONTENT_W, height: 15, color: COLORS.navy })
+  p4.drawText('9. AUDIT BY QUALITY ASSURANCE / AUDITORIA POR ASEGURAMIENTO DE CALIDAD', { x: MARGIN + 3, y: y - 10, size: 5.5, font: ctx.bold, color: COLORS.white })
+  p4.drawText('NAME / NOMBRE:', { x: MARGIN + 3, y: y - 22, size: 5.5, font: ctx.bold, color: COLORS.black })
+  p4.drawText(sanitize(inspection.signatures?.qualityAssuranceName ?? ''), { x: MARGIN + 70, y: y - 22, size: 6, font: ctx.regular, color: COLORS.black })
+  p4.drawText('APPROVED / APROBADO:', { x: MARGIN + 3, y: y - 35, size: 5.5, font: ctx.bold, color: COLORS.black })
+  // YES
+  p4.drawRectangle({ x: MARGIN + 3, y: y - 50, width: 10, height: 10, borderColor: COLORS.darkGray, borderWidth: 0.5, color: COLORS.white })
+  if (inspection.signatures?.qualityAssuranceApproved === 'yes') p4.drawText('X', { x: MARGIN + 5, y: y - 48, size: 8, font: ctx.bold, color: COLORS.black })
+  p4.drawText('YES / SI', { x: MARGIN + 16, y: y - 47, size: 6, font: ctx.regular, color: COLORS.black })
+  // NO
+  p4.drawRectangle({ x: MARGIN + 50, y: y - 50, width: 10, height: 10, borderColor: COLORS.darkGray, borderWidth: 0.5, color: COLORS.white })
+  if (inspection.signatures?.qualityAssuranceApproved === 'no') p4.drawText('X', { x: MARGIN + 52, y: y - 48, size: 8, font: ctx.bold, color: COLORS.black })
+  p4.drawText('NO / NO', { x: MARGIN + 63, y: y - 47, size: 6, font: ctx.regular, color: COLORS.black })
+  p4.drawText('DATE / FECHA:', { x: MARGIN + 3, y: y - 62, size: 5.5, font: ctx.bold, color: COLORS.black })
+  p4.drawText(formatDate(new Date().toISOString()), { x: MARGIN + 50, y: y - 62, size: 6, font: ctx.regular, color: COLORS.black })
+  p4.drawText('SIGNATURE / FIRMA:', { x: MARGIN + 3, y: y - 75, size: 5.5, font: ctx.bold, color: COLORS.black })
+  y -= 88
+
+  sy4(y)
+
   // Add headers to all pages (two-pass for page numbers)
   const totalBodyPages = ctx.doc.getPageCount()
   const totalPhotos = figures.length
@@ -308,7 +409,7 @@ export async function exportFormatA(inspection: Inspection, draft: boolean): Pro
   const totalPages = totalBodyPages + annexPages
 
   // Draw headers now that we know total
-  ;[p1, p2, p3].forEach((pg, i) => {
+  ;[p1, p2, p3, p4].forEach((pg, i) => {
     drawHeaderBox(pg, ctx, i + 1, totalPages)
     if (draft) drawDraftWatermark(pg, ctx)
   })

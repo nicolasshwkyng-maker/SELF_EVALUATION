@@ -10,6 +10,7 @@ import MaterialsSection from './components/sections/MaterialsSection'
 import TechnicalDataSection from './components/sections/TechnicalDataSection'
 import ProcessesSection from './components/sections/ProcessesSection'
 import PersonnelSection from './components/sections/PersonnelSection'
+import ContractSection from './components/sections/ContractSection'
 import SummarySection from './components/sections/SummarySection'
 
 function LoadingScreen() {
@@ -41,7 +42,8 @@ export default function App() {
       case 6: return <TechnicalDataSection />
       case 7: return <ProcessesSection />
       case 8: return <PersonnelSection />
-      case 9: return <SummarySection onSectionChange={setSection} />
+      case 9: return <ContractSection />
+      case 10: return <SummarySection onSectionChange={setSection} />
       default: return <AdminSection />
     }
   }

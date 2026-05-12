@@ -101,8 +101,23 @@ export interface SectionVerify {
   personnel: ComplianceStatus
 }
 
+export interface ContractMaintenanceService {
+  id: string
+  serviceType: string
+  standard: string
+}
+
 export interface ContractMaintenance {
-  services: string[]
+  services: ContractMaintenanceService[]
+}
+
+export interface Signatures {
+  maintenanceResponsibleName: string
+  maintenanceApproved: ComplianceStatus
+  qualityControlResponsibleName: string
+  qualityControlApproved: ComplianceStatus
+  qualityAssuranceName: string
+  qualityAssuranceApproved: ComplianceStatus
 }
 
 export interface Inspection {
@@ -123,6 +138,7 @@ export interface Inspection {
   personnelValidation: ValidationQuestion[]
   sectionVerify: SectionVerify
   contractMaintenance: ContractMaintenance
+  signatures: Signatures
   observations: string
 }
 

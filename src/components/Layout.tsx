@@ -20,6 +20,7 @@ const NAV_KEYS = [
   'nav.techData',
   'nav.processes',
   'nav.personnel',
+  'nav.contract',
   'nav.summary',
 ]
 
@@ -89,6 +90,7 @@ export default function Layout({ children, currentSection, onSectionChange }: Pr
             ← Anterior
           </button>
           <span className="text-xs text-gray-400 self-center">{currentSection + 1} / {NAV_KEYS.length}</span>
+
           <button
             type="button"
             disabled={currentSection === NAV_KEYS.length - 1}

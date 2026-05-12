@@ -95,6 +95,14 @@ export function createEmptyInspection(): Inspection {
       personnel: null,
     },
     contractMaintenance: { services: [] },
+    signatures: {
+      maintenanceResponsibleName: '',
+      maintenanceApproved: null,
+      qualityControlResponsibleName: '',
+      qualityControlApproved: null,
+      qualityAssuranceName: '',
+      qualityAssuranceApproved: null,
+    },
     observations: '',
   }
 }

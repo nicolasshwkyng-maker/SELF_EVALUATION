@@ -47,13 +47,13 @@ interface Props {
   currentSection: number
 }
 
-const SECTION_NAMES = ['Admin', 'Comp.', '2.1', '2.2', 'Equip.', 'Mat.', 'Tech.', 'Proc.', 'Pers.', 'Export']
+const SECTION_NAMES = ['Admin', 'Comp.', '2.1', '2.2', 'Equip.', 'Mat.', 'Tech.', 'Proc.', 'Pers.', 'Cont.', 'Export']
 
 export default function ProgressBar({ inspection, currentSection }: Props) {
   const progress = getSectionProgress(inspection)
   const values = [
     progress.admin,
-    100, // component section (optional fields)
+    100,
     progress.housing,
     progress.facilities,
     progress.tools,
@@ -61,6 +61,7 @@ export default function ProgressBar({ inspection, currentSection }: Props) {
     progress.techData,
     progress.processes,
     progress.personnel,
+    100,
     100,
   ]
 
