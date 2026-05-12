@@ -103,14 +103,17 @@ export function drawHeaderBox(
       size: codeSize, font: bold, color: COLORS.black,
     })
   } else {
-    // ── 2-column fallback (no logo) ─────────────────────────────────────────
-    page.drawRectangle({ x: MARGIN, y: headerY, width: CONTENT_W - CODE_COL_W, height: HEADER_H, color: COLORS.navyHeader })
-    page.drawText('MAINTENANCE CAPABILITIES EVALUATION FORMAT FOR SATENA SUPPORT WORKSHOPS / FORMATO EVALUACION DE', {
-      x: MARGIN + 4, y: headerY + HEADER_H - 12, size: 5.5, font: bold, color: COLORS.white,
-    })
-    page.drawText('CAPACIDADES DE MANTENIMIENTO PARA TALLERES DE TRABAJO SATENA', {
-      x: MARGIN + 4, y: headerY + HEADER_H - 20, size: 5.5, font: bold, color: COLORS.white,
-    })
+    // ── 2-column fallback (no logo) — same white/gray/black centered style ──
+    const fbW = CONTENT_W - CODE_COL_W
+    page.drawRectangle({ x: MARGIN, y: headerY, width: fbW, height: HEADER_H, color: COLORS.white, borderColor: COLORS.navyHeader, borderWidth: 0.5 })
+    const enFb = 'MAINTENANCE CAPABILITIES EVALUATION FORMAT FOR SATENA SUPPORT WORKSHOPS'
+    const esFb = 'FORMATO EVALUACION DE CAPACIDADES DE MANTENIMIENTO PARA TALLERES SATENA'
+    const codeFb = 'SAT-F743'
+    const tsz = 5.5, csz = 7
+    const gray2 = rgb(0.45, 0.45, 0.45) as RGB
+    page.drawText(enFb, { x: MARGIN + (fbW - bold.widthOfTextAtSize(enFb, tsz)) / 2, y: headerY + HEADER_H - 10, size: tsz, font: bold, color: gray2 })
+    page.drawText(esFb, { x: MARGIN + (fbW - bold.widthOfTextAtSize(esFb, tsz)) / 2, y: headerY + HEADER_H - 18, size: tsz, font: bold, color: COLORS.black })
+    page.drawText(codeFb, { x: MARGIN + (fbW - bold.widthOfTextAtSize(codeFb, csz)) / 2, y: headerY + HEADER_H - 28, size: csz, font: bold, color: COLORS.black })
   }
 
   // Column 3 — document control (light gray, always present)

@@ -6,6 +6,7 @@ import {
   MARGIN, CONTENT_W, PAGE_H, COLORS,
 } from './pdfHelpers'
 import { buildPhotoAnnex } from './photoAnnex'
+import logoSrc from '../assets/satena-logo.png'
 
 function formatDate(iso: string): string {
   if (!iso) return ''
@@ -18,10 +19,9 @@ function formatDate(iso: string): string {
 
 async function loadLogoImage(ctx: import('./pdfHelpers').PdfCtx) {
   try {
-    const res = await fetch('/satena-logo.png')
+    const res = await fetch(logoSrc)
     if (!res.ok) return undefined
-    const buf = await res.arrayBuffer()
-    return await ctx.doc.embedPng(new Uint8Array(buf))
+    return await ctx.doc.embedPng(new Uint8Array(await res.arrayBuffer()))
   } catch {
     return undefined
   }
