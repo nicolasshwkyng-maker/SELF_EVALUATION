@@ -1,0 +1,189 @@
+{
+  "appName": "SAT-F743 Maintenance Capabilities Evaluation",
+  "appShort": "SAT-F743",
+  "lang": "EN",
+  "langToggle": "ES",
+
+  "nav": {
+    "admin": "Administrative",
+    "component": "Component",
+    "housing": "Housing",
+    "facilities": "Facilities",
+    "tools": "Equipment",
+    "materials": "Material",
+    "techData": "Technical Data",
+    "processes": "Processes",
+    "personnel": "Personnel",
+    "summary": "Summary"
+  },
+
+  "status": {
+    "saving": "Saving...",
+    "saved": "Saved ✓",
+    "error": "Save error"
+  },
+
+  "compliance": {
+    "yes": "Yes",
+    "no": "No",
+    "na": "N/A"
+  },
+
+  "photo": {
+    "camera": "Camera",
+    "gallery": "Gallery",
+    "limitReached": "Limit reached — delete a photo to add more",
+    "caption": "Caption (optional)",
+    "delete": "Delete photo",
+    "edit": "Edit caption",
+    "save": "Save"
+  },
+
+  "common": {
+    "add": "Add",
+    "delete": "Delete",
+    "confirm": "Are you sure?",
+    "cancel": "Cancel",
+    "save": "Save",
+    "evidence": "Evidence / Evidencia",
+    "verify": "Verify / Verificado",
+    "requirements": "Requirements / Requerimientos",
+    "notes": "Notes",
+    "optional": "optional"
+  },
+
+  "admin": {
+    "title": "0. Administrative Section",
+    "workshopName": "Name of the workshop leader",
+    "requestDate": "Request date",
+    "responsible": "Responsible for the request",
+    "rating": "Rating / Capacidad",
+    "ratingVerify": "Verify / Verificado"
+  },
+
+  "component": {
+    "title": "1. Component Identification",
+    "description": "Description / Descripción",
+    "manufacturer": "Manufacturer / Fabricante",
+    "partNumber": "Part Number / Número de parte",
+    "scope": "Scope / Alcance",
+    "ata": "ATA",
+    "applicableEquipment": "Applicable Equipment / Equipo aplicable",
+    "verify": "Verify / Verificado"
+  },
+
+  "housing": {
+    "title": "2.1 Housing / Edificios",
+    "sectionVerify": "Verify section 2.1"
+  },
+
+  "facilities": {
+    "title": "2.2 Facilities / Instalaciones",
+    "sectionVerify": "Verify section 2.2"
+  },
+
+  "tools": {
+    "title": "3. Equipment / Equipos",
+    "description": "Description",
+    "partNumber": "Part Number",
+    "serialNumber": "Serial Number",
+    "calibrationExpiry": "Calibration Expiry",
+    "toolKind": "Kind of Tool",
+    "kinds": {
+      "standard": "Standard",
+      "special": "Special",
+      "equivalent": "Equivalent",
+      "calibration": "Calibration"
+    },
+    "addTool": "Add tool",
+    "sectionVerify": "Verify section 3",
+    "validation": {
+      "title": "3.1 Validation Questions"
+    }
+  },
+
+  "materials": {
+    "title": "4. Material",
+    "description": "Description",
+    "partNumber": "Part Number / Reference",
+    "equivalent": "Equivalent",
+    "addMaterial": "Add material",
+    "sectionVerify": "Verify section 4"
+  },
+
+  "techData": {
+    "title": "5. Technical Data / Datos Técnicos",
+    "publicationType": "Publication Type",
+    "reference": "Reference No.",
+    "revNumber": "Rev. No.",
+    "revDate": "Rev. Date",
+    "addRow": "Add publication",
+    "sectionVerify": "Verify section 5"
+  },
+
+  "processes": {
+    "title": "6. Processes / Procesos",
+    "name": "Process Name",
+    "identification": "Format Identification",
+    "revNumber": "Rev. No.",
+    "revDate": "Rev. Date",
+    "addRow": "Add process",
+    "sectionVerify": "Verify section 6"
+  },
+
+  "personnel": {
+    "title": "7. Trained Personnel / Personal Entrenado",
+    "nameJobTitle": "Name / Job Title",
+    "license": "License",
+    "specificTraining": "Specific Training",
+    "addRow": "Add personnel",
+    "sectionVerify": "Verify section 7",
+    "validation": {
+      "title": "7.2 Validation Questions"
+    }
+  },
+
+  "summary": {
+    "title": "Summary & Export",
+    "totalPhotos": "Total photos",
+    "observations": "Observations / Observaciones",
+    "pdfFormat": "PDF Format",
+    "formatA": "A) Official SAT-F743 replica",
+    "formatB": "B) Free audit report",
+    "exportPdf": "Export PDF",
+    "exportJson": "Export JSON",
+    "importJson": "Import JSON",
+    "newInspection": "New inspection",
+    "newInspectionConfirm": "Create new inspection? All current data will be lost.",
+    "importConfirm": "Import? This will replace the current inspection.",
+    "warnings": "Warnings",
+    "noWarnings": "No warnings — ready to export",
+    "goToSection": "Go to section",
+    "exportDraft": "Export as draft",
+    "backToEdit": "Back to edit",
+    "section": "Section",
+    "complete": "complete",
+    "incomplete": "incomplete"
+  },
+
+  "errors": {
+    "workshopRequired": "Section 0: workshop name is missing",
+    "requestDateRequired": "Section 0: request date is missing",
+    "toolDescRequired": "Section 3 — Row {{row}}: description missing",
+    "toolPnRequired": "Section 3 — Row {{row}}: part number missing",
+    "materialDescRequired": "Section 4 — Row {{row}}: description missing",
+    "materialPnRequired": "Section 4 — Row {{row}}: part number/reference missing",
+    "techDataTypeRequired": "Section 5 — Row {{row}}: publication type missing",
+    "techDataRefRequired": "Section 5 — Row {{row}}: reference number missing",
+    "processNameRequired": "Section 6 — Row {{row}}: process name missing",
+    "processRefRequired": "Section 6 — Row {{row}}: format identification missing",
+    "personnelNameRequired": "Section 7 — Row {{row}}: name/job title missing",
+    "personnelLicenseRequired": "Section 7 — Row {{row}}: license number missing"
+  },
+
+  "pwa": {
+    "install": "Install app",
+    "updateAvailable": "Update available",
+    "reload": "Reload"
+  }
+}

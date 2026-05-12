@@ -1,0 +1,189 @@
+{
+  "appName": "SAT-F743 Evaluación de Capacidades",
+  "appShort": "SAT-F743",
+  "lang": "ES",
+  "langToggle": "EN",
+
+  "nav": {
+    "admin": "Administrativa",
+    "component": "Componente",
+    "housing": "Edificios",
+    "facilities": "Instalaciones",
+    "tools": "Equipos",
+    "materials": "Material",
+    "techData": "Datos Técnicos",
+    "processes": "Procesos",
+    "personnel": "Personal",
+    "summary": "Resumen"
+  },
+
+  "status": {
+    "saving": "Guardando...",
+    "saved": "Guardado ✓",
+    "error": "Error al guardar"
+  },
+
+  "compliance": {
+    "yes": "Sí",
+    "no": "No",
+    "na": "N/A"
+  },
+
+  "photo": {
+    "camera": "Cámara",
+    "gallery": "Galería",
+    "limitReached": "Límite alcanzado — elimina una foto para añadir más",
+    "caption": "Descripción (opcional)",
+    "delete": "Eliminar foto",
+    "edit": "Editar descripción",
+    "save": "Guardar"
+  },
+
+  "common": {
+    "add": "Agregar",
+    "delete": "Eliminar",
+    "confirm": "¿Estás seguro?",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "evidence": "Evidencia / Evidence",
+    "verify": "Verificado / Verify",
+    "requirements": "Requerimientos / Requirements",
+    "notes": "Notas",
+    "optional": "opcional"
+  },
+
+  "admin": {
+    "title": "0. Sección Administrativa",
+    "workshopName": "Nombre del encargado del taller",
+    "requestDate": "Fecha de requerimiento",
+    "responsible": "Responsable del requerimiento",
+    "rating": "Capacidad / Rating",
+    "ratingVerify": "Verificado / Verify"
+  },
+
+  "component": {
+    "title": "1. Identificación del Componente",
+    "description": "Descripción / Description",
+    "manufacturer": "Fabricante / Manufacturer",
+    "partNumber": "Número de parte / Part Number",
+    "scope": "Alcance / Scope",
+    "ata": "ATA",
+    "applicableEquipment": "Equipo aplicable / Applicable Equipment",
+    "verify": "Verificado / Verify"
+  },
+
+  "housing": {
+    "title": "2.1 Edificios / Housing",
+    "sectionVerify": "Verificado sección 2.1"
+  },
+
+  "facilities": {
+    "title": "2.2 Instalaciones / Facilities",
+    "sectionVerify": "Verificado sección 2.2"
+  },
+
+  "tools": {
+    "title": "3. Equipos / Equipment",
+    "description": "Descripción",
+    "partNumber": "Número de parte",
+    "serialNumber": "Número de serie",
+    "calibrationExpiry": "Vencimiento de calibración",
+    "toolKind": "Tipo de herramienta",
+    "kinds": {
+      "standard": "Estándar",
+      "special": "Especial",
+      "equivalent": "Equivalente",
+      "calibration": "Calibración"
+    },
+    "addTool": "Agregar herramienta",
+    "sectionVerify": "Verificado sección 3",
+    "validation": {
+      "title": "3.1 Preguntas de Validación"
+    }
+  },
+
+  "materials": {
+    "title": "4. Material",
+    "description": "Descripción",
+    "partNumber": "Número de parte / Referencia",
+    "equivalent": "Equivalente",
+    "addMaterial": "Agregar material",
+    "sectionVerify": "Verificado sección 4"
+  },
+
+  "techData": {
+    "title": "5. Datos Técnicos / Technical Data",
+    "publicationType": "Tipo de publicación",
+    "reference": "No. de referencia",
+    "revNumber": "Rev. No.",
+    "revDate": "Fecha de Rev.",
+    "addRow": "Agregar publicación",
+    "sectionVerify": "Verificado sección 5"
+  },
+
+  "processes": {
+    "title": "6. Procesos / Processes",
+    "name": "Nombre del proceso",
+    "identification": "Identificación del proceso",
+    "revNumber": "Rev. No.",
+    "revDate": "Fecha de Rev.",
+    "addRow": "Agregar proceso",
+    "sectionVerify": "Verificado sección 6"
+  },
+
+  "personnel": {
+    "title": "7. Personal Entrenado / Trained Personnel",
+    "nameJobTitle": "Nombre y cargo",
+    "license": "Licencia",
+    "specificTraining": "Entrenamiento específico",
+    "addRow": "Agregar personal",
+    "sectionVerify": "Verificado sección 7",
+    "validation": {
+      "title": "7.2 Preguntas de Validación"
+    }
+  },
+
+  "summary": {
+    "title": "Resumen y Exportación",
+    "totalPhotos": "Fotos totales",
+    "observations": "Observaciones / Observations",
+    "pdfFormat": "Formato de PDF",
+    "formatA": "A) Réplica oficial SAT-F743",
+    "formatB": "B) Reporte de auditoría libre",
+    "exportPdf": "Exportar PDF",
+    "exportJson": "Exportar JSON",
+    "importJson": "Importar JSON",
+    "newInspection": "Nueva inspección",
+    "newInspectionConfirm": "¿Crear nueva inspección? Se perderán todos los datos actuales.",
+    "importConfirm": "¿Importar? Reemplazará la inspección actual.",
+    "warnings": "Advertencias",
+    "noWarnings": "Sin advertencias — listo para exportar",
+    "goToSection": "Ir a sección",
+    "exportDraft": "Exportar como borrador",
+    "backToEdit": "Volver a editar",
+    "section": "Sección",
+    "complete": "completo",
+    "incomplete": "incompleto"
+  },
+
+  "errors": {
+    "workshopRequired": "Sección 0: falta nombre del taller",
+    "requestDateRequired": "Sección 0: falta fecha de requerimiento",
+    "toolDescRequired": "Sección 3 — Fila {{row}}: falta descripción",
+    "toolPnRequired": "Sección 3 — Fila {{row}}: falta número de parte",
+    "materialDescRequired": "Sección 4 — Fila {{row}}: falta descripción",
+    "materialPnRequired": "Sección 4 — Fila {{row}}: falta número de parte/referencia",
+    "techDataTypeRequired": "Sección 5 — Fila {{row}}: falta tipo de publicación",
+    "techDataRefRequired": "Sección 5 — Fila {{row}}: falta número de referencia",
+    "processNameRequired": "Sección 6 — Fila {{row}}: falta nombre del proceso",
+    "processRefRequired": "Sección 6 — Fila {{row}}: falta identificación",
+    "personnelNameRequired": "Sección 7 — Fila {{row}}: falta nombre y cargo",
+    "personnelLicenseRequired": "Sección 7 — Fila {{row}}: falta número de licencia"
+  },
+
+  "pwa": {
+    "install": "Instalar app",
+    "updateAvailable": "Hay una actualización disponible",
+    "reload": "Recargar"
+  }
+}
