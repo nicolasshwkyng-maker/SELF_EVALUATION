@@ -83,7 +83,7 @@ export async function exportToJson(inspection: Inspection, catalog?: Catalog): P
   const blob = new Blob([json], { type: 'application/json' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
-  const partNumber = inspection.componentId.partNumber.trim() || 'SIN-PN'
+  const partNumber = safeFilename(inspection.componentId.partNumber.trim())
   a.href = url
   a.download = `SAT-F743 - ${partNumber}.json`
   a.click()
@@ -118,6 +118,16 @@ export async function importFromJson(file: File): Promise<ImportResult> {
     reader.onerror = reject
     reader.readAsText(file)
   })
+}
+
+/** Remove / replace characters that are illegal in filenames on any OS. */
+export function safeFilename(name: string): string {
+  return name
+    .replace(/[/\\:*?"<>|]/g, '-')   // illegal on Windows / macOS / Linux
+    .replace(/\s*-\s*/g, '-')          // collapse " - " around replacements
+    .replace(/-+/g, '-')               // collapse consecutive dashes
+    .replace(/^[-.\s]+|[-.\s]+$/g, '') // trim leading / trailing dashes or dots
+    || 'SIN-PN'
 }
 
 export function triggerPdfDownload(bytes: Uint8Array, filename: string) {

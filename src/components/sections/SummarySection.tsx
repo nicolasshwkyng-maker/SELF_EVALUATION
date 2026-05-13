@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { FileText, Download, Upload, PlusCircle, AlertTriangle, CheckCircle } from 'lucide-react'
 import { useInspection } from '../../context/InspectionContext'
 import { useCatalog } from '../../context/CatalogContext'
-import { exportToJson, importFromJson, triggerPdfDownload } from '../../utils/jsonExport'
+import { exportToJson, importFromJson, triggerPdfDownload, safeFilename } from '../../utils/jsonExport'
 import { exportFormatA } from '../../pdf/exportFormatA'
 import { exportFormatB } from '../../pdf/exportFormatB'
 import { deleteInspection, createEmptyInspection } from '../../db/indexeddb'
@@ -68,7 +68,7 @@ export default function SummarySection({ onSectionChange }: { onSectionChange: (
       const bytes = pdfFormat === 'A'
         ? await exportFormatA(inspection, draft)
         : await exportFormatB(inspection, draft)
-      const partNumber = inspection.componentId.partNumber.trim() || 'SIN-PN'
+      const partNumber = safeFilename(inspection.componentId.partNumber.trim())
       triggerPdfDownload(bytes, `SAT-F743 - ${partNumber}.pdf`)
     } catch (e) {
       console.error('PDF export error:', e)
