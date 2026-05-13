@@ -1,6 +1,6 @@
 import { openDB, type IDBPDatabase } from 'idb'
 import { v4 as uuidv4 } from 'uuid'
-import type { Inspection, PhotoEvidence } from '../types'
+import type { Inspection, PhotoEvidence, Catalog } from '../types'
 import {
   HOUSING_ITEMS,
   FACILITIES_ITEMS,
@@ -10,27 +10,47 @@ import {
 } from '../types'
 
 const DB_NAME = 'sat-f743'
-const DB_VERSION = 1
+const DB_VERSION = 2
 const INSPECTIONS_STORE = 'inspections'
 const PHOTOS_STORE = 'photos_blobs'
+const CATALOG_STORE = 'catalog'
 const CURRENT_KEY = 'current'
+const CATALOG_KEY = 'master'
 
 let dbPromise: Promise<IDBPDatabase> | null = null
 
 function getDB() {
   if (!dbPromise) {
     dbPromise = openDB(DB_NAME, DB_VERSION, {
-      upgrade(db) {
+      upgrade(db, oldVersion) {
         if (!db.objectStoreNames.contains(INSPECTIONS_STORE)) {
           db.createObjectStore(INSPECTIONS_STORE)
         }
         if (!db.objectStoreNames.contains(PHOTOS_STORE)) {
           db.createObjectStore(PHOTOS_STORE)
         }
+        if (oldVersion < 2 && !db.objectStoreNames.contains(CATALOG_STORE)) {
+          db.createObjectStore(CATALOG_STORE)
+        }
       },
     })
   }
   return dbPromise
+}
+
+export function createEmptyCatalog(): Catalog {
+  return { tools: [], materials: [], personnel: [] }
+}
+
+export async function loadCatalog(): Promise<Catalog> {
+  const db = await getDB()
+  const data = await db.get(CATALOG_STORE, CATALOG_KEY)
+  return data ?? createEmptyCatalog()
+}
+
+export async function saveCatalog(catalog: Catalog): Promise<void> {
+  const db = await getDB()
+  await db.put(CATALOG_STORE, catalog, CATALOG_KEY)
 }
 
 export function createEmptyInspection(): Inspection {

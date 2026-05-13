@@ -1,25 +1,36 @@
-import { Trash2, PlusCircle } from 'lucide-react'
+import { Trash2, PlusCircle, Images } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { v4 as uuidv4 } from 'uuid'
 import { useInspection } from '../../context/InspectionContext'
+import { useCatalog } from '../../context/CatalogContext'
 import ComplianceToggle from '../ComplianceToggle'
 import PhotoCapture from '../PhotoCapture'
 import type { ToolRow, ValidationQuestion, PhotoEvidence } from '../../types'
+import { catalogMatchKey } from '../../types'
 
 const TOOL_KINDS = ['', 'standard', 'special', 'equivalent', 'calibration'] as const
 
-function ToolCard({ row, index, onChange, onDelete }: {
+function ToolCard({ row, index, onChange, onDelete, catalogPhotoCount }: {
   row: ToolRow
   index: number
   onChange: (r: ToolRow) => void
   onDelete: () => void
+  catalogPhotoCount: number
 }) {
   const { t } = useTranslation()
 
   return (
     <div className="border border-gray-200 rounded-xl bg-white p-4 space-y-3">
       <div className="flex items-center justify-between">
-        <span className="text-sm font-semibold text-slate-700">#{index + 1}</span>
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-semibold text-slate-700">#{index + 1}</span>
+          {catalogPhotoCount > 0 && (
+            <span className="inline-flex items-center gap-1 bg-amber-100 text-amber-700 text-xs font-semibold px-2 py-0.5 rounded-full">
+              <Images className="w-3 h-3" />
+              {catalogPhotoCount} en catálogo
+            </span>
+          )}
+        </div>
         <button
           type="button"
           onClick={onDelete}
@@ -110,6 +121,7 @@ function ValidationCard({ q, onChange }: {
 export default function ToolsSection() {
   const { t } = useTranslation()
   const { inspection, update } = useInspection()
+  const { findToolPhotos } = useCatalog()
   if (!inspection) return null
 
   const addTool = () => update((prev) => ({
@@ -131,9 +143,20 @@ export default function ToolsSection() {
       <h2 className="text-lg font-bold text-slate-800">{t('tools.title')}</h2>
 
       <div className="space-y-3">
-        {inspection.tools.map((row, i) => (
-          <ToolCard key={row.id} row={row} index={i} onChange={(r) => updateTool(i, r)} onDelete={() => deleteTool(i)} />
-        ))}
+        {inspection.tools.map((row, i) => {
+          const matchKey = catalogMatchKey(row.partNumber || row.description)
+          const catalogPhotoCount = matchKey ? findToolPhotos(matchKey).length : 0
+          return (
+            <ToolCard
+              key={row.id}
+              row={row}
+              index={i}
+              onChange={(r) => updateTool(i, r)}
+              onDelete={() => deleteTool(i)}
+              catalogPhotoCount={catalogPhotoCount}
+            />
+          )
+        })}
       </div>
 
       <button

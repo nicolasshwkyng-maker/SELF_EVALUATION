@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FileText, Download, Upload, PlusCircle, AlertTriangle, CheckCircle } from 'lucide-react'
 import { useInspection } from '../../context/InspectionContext'
+import { useCatalog } from '../../context/CatalogContext'
 import { exportToJson, importFromJson, triggerPdfDownload } from '../../utils/jsonExport'
 import { exportFormatA } from '../../pdf/exportFormatA'
 import { exportFormatB } from '../../pdf/exportFormatB'
@@ -48,6 +49,7 @@ function countPhotos(inspection: NonNullable<ReturnType<typeof useInspection>['i
 export default function SummarySection({ onSectionChange }: { onSectionChange: (i: number) => void }) {
   const { t } = useTranslation()
   const { inspection, update, setInspection } = useInspection()
+  const { catalog, setCatalog, syncFromInspection } = useCatalog()
   const [pdfFormat, setPdfFormat] = useState<'A' | 'B'>('A')
   const [showWarnings, setShowWarnings] = useState(false)
   const [exporting, setExporting] = useState(false)
@@ -86,7 +88,7 @@ export default function SummarySection({ onSectionChange }: { onSectionChange: (
 
   const handleExportJson = async () => {
     try {
-      await exportToJson(inspection)
+      await exportToJson(inspection, catalog)
     } catch (e) {
       console.error('JSON export error:', e)
     }
@@ -96,8 +98,13 @@ export default function SummarySection({ onSectionChange }: { onSectionChange: (
     if (!confirm(t('summary.importConfirm'))) return
     setImporting(true)
     try {
-      const imported = await importFromJson(file)
+      const { inspection: imported, catalog: importedCatalog } = await importFromJson(file)
       setInspection(imported)
+      if (importedCatalog) {
+        setCatalog(importedCatalog)
+      } else {
+        syncFromInspection(imported)
+      }
     } catch (e) {
       alert('Error al importar: ' + String(e))
     } finally {

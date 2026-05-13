@@ -1,4 +1,4 @@
-import type { Inspection, PhotoEvidence } from '../types'
+import type { Inspection, PhotoEvidence, Catalog } from '../types'
 import { getAllBlobEntries, saveBlobFromDataUrl, saveBlob } from '../db/indexeddb'
 import { blobToDataUrl } from './imageProcessing'
 import { createEmptyInspection } from '../db/indexeddb'
@@ -13,13 +13,39 @@ interface ExportPayload {
   exportedAt: string
   inspection: Inspection
   photos: ExportedPhoto[]
+  catalog?: Catalog
+  catalogPhotos?: ExportedPhoto[]
 }
 
-export async function exportToJson(inspection: Inspection): Promise<void> {
+export interface ImportResult {
+  inspection: Inspection
+  catalog: Catalog | null
+}
+
+async function blobifyPhotos(
+  photos: PhotoEvidence[],
+  blobMap: Map<string, Blob>,
+): Promise<ExportedPhoto[]> {
+  const result: ExportedPhoto[] = []
+  for (const photo of photos) {
+    const blob = blobMap.get(photo.blobKey)
+    const thumb = blobMap.get(photo.thumbnailBlobKey)
+    if (blob && thumb) {
+      result.push({
+        ...photo,
+        dataUrl: await blobToDataUrl(blob),
+        thumbDataUrl: await blobToDataUrl(thumb),
+      })
+    }
+  }
+  return result
+}
+
+export async function exportToJson(inspection: Inspection, catalog?: Catalog): Promise<void> {
   const blobEntries = await getAllBlobEntries()
   const blobMap = new Map(blobEntries.map((e) => [e.key, e.blob]))
 
-  const allPhotos: PhotoEvidence[] = [
+  const inspectionPhotos: PhotoEvidence[] = [
     ...inspection.housing.flatMap((i) => i.photos),
     ...inspection.facilities.flatMap((i) => i.photos),
     ...inspection.tools.flatMap((t) => t.photos),
@@ -31,17 +57,17 @@ export async function exportToJson(inspection: Inspection): Promise<void> {
     ...inspection.personnelValidation.flatMap((q) => q.photos),
   ]
 
-  const exportedPhotos: ExportedPhoto[] = []
-  for (const photo of allPhotos) {
-    const blob = blobMap.get(photo.blobKey)
-    const thumb = blobMap.get(photo.thumbnailBlobKey)
-    if (blob && thumb) {
-      exportedPhotos.push({
-        ...photo,
-        dataUrl: await blobToDataUrl(blob),
-        thumbDataUrl: await blobToDataUrl(thumb),
-      })
-    }
+  const exportedPhotos = await blobifyPhotos(inspectionPhotos, blobMap)
+
+  // Catalog photos
+  let exportedCatalogPhotos: ExportedPhoto[] = []
+  if (catalog) {
+    const catalogPhotos: PhotoEvidence[] = [
+      ...catalog.tools.flatMap((t) => t.photos),
+      ...catalog.materials.flatMap((m) => m.photos),
+      ...catalog.personnel.flatMap((p) => p.photos),
+    ]
+    exportedCatalogPhotos = await blobifyPhotos(catalogPhotos, blobMap)
   }
 
   const payload: ExportPayload = {
@@ -49,6 +75,8 @@ export async function exportToJson(inspection: Inspection): Promise<void> {
     exportedAt: new Date().toISOString(),
     inspection,
     photos: exportedPhotos,
+    catalog: catalog ?? undefined,
+    catalogPhotos: exportedCatalogPhotos.length > 0 ? exportedCatalogPhotos : undefined,
   }
 
   const json = JSON.stringify(payload)
@@ -62,7 +90,7 @@ export async function exportToJson(inspection: Inspection): Promise<void> {
   URL.revokeObjectURL(url)
 }
 
-export async function importFromJson(file: File): Promise<Inspection> {
+export async function importFromJson(file: File): Promise<ImportResult> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.onload = async () => {
@@ -70,13 +98,19 @@ export async function importFromJson(file: File): Promise<Inspection> {
         const payload = JSON.parse(reader.result as string) as ExportPayload
         if (!payload.inspection) throw new Error('Archivo inválido: falta inspection')
 
-        // Re-save all blobs
+        // Re-save inspection photo blobs
         for (const photo of payload.photos ?? []) {
           if (photo.dataUrl) await saveBlobFromDataUrl(photo.blobKey, photo.dataUrl)
           if (photo.thumbDataUrl) await saveBlobFromDataUrl(photo.thumbnailBlobKey, photo.thumbDataUrl)
         }
 
-        resolve(payload.inspection)
+        // Re-save catalog photo blobs
+        for (const photo of payload.catalogPhotos ?? []) {
+          if (photo.dataUrl) await saveBlobFromDataUrl(photo.blobKey, photo.dataUrl)
+          if (photo.thumbDataUrl) await saveBlobFromDataUrl(photo.thumbnailBlobKey, photo.thumbDataUrl)
+        }
+
+        resolve({ inspection: payload.inspection, catalog: payload.catalog ?? null })
       } catch (e) {
         reject(e)
       }

@@ -1,4 +1,6 @@
+import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { FolderOpen } from 'lucide-react'
 import { useInspection } from '../context/InspectionContext'
 import ProgressBar from './ProgressBar'
 import LanguageToggle from './LanguageToggle'
@@ -8,6 +10,7 @@ interface Props {
   children: ReactNode
   currentSection: number
   onSectionChange: (i: number) => void
+  onImport: (file: File) => void
 }
 
 const NAV_KEYS = [
@@ -21,12 +24,14 @@ const NAV_KEYS = [
   'nav.processes',
   'nav.personnel',
   'nav.contract',
+  'nav.catalog',
   'nav.summary',
 ]
 
-export default function Layout({ children, currentSection, onSectionChange }: Props) {
+export default function Layout({ children, currentSection, onSectionChange, onImport }: Props) {
   const { t } = useTranslation()
   const { inspection, saveStatus } = useInspection()
+  const importRef = useRef<HTMLInputElement>(null)
 
   const statusColor = saveStatus === 'saved' ? 'text-green-300' : saveStatus === 'saving' ? 'text-yellow-300' : saveStatus === 'error' ? 'text-red-300' : 'text-slate-400'
 
@@ -44,6 +49,25 @@ export default function Layout({ children, currentSection, onSectionChange }: Pr
             </div>
             <div className="flex items-center gap-2">
               <span className={`text-xs ${statusColor}`}>{t(`status.${saveStatus === 'idle' ? 'saved' : saveStatus}`)}</span>
+              <button
+                type="button"
+                title="Abrir JSON / Open JSON"
+                onClick={() => importRef.current?.click()}
+                className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-2.5 py-1.5 rounded-lg transition-colors"
+              >
+                <FolderOpen className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Abrir</span>
+              </button>
+              <input
+                ref={importRef}
+                type="file"
+                accept=".json"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0]
+                  if (file) { onImport(file); e.target.value = '' }
+                }}
+              />
               <LanguageToggle />
             </div>
           </div>

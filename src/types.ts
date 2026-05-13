@@ -251,3 +251,37 @@ export const PERSONNEL_VALIDATION_QUESTIONS: Pick<ValidationQuestion, 'id' | 'qu
 
 export const MAX_PHOTOS_PER_ITEM = 5
 export const SCHEMA_VERSION = 1
+
+// ── Shared Evidence Catalog ───────────────────────────────────────────────────
+
+/** Normalize any identifier to a stable match key */
+export function catalogMatchKey(s: string): string {
+  return s.trim().toUpperCase().replace(/\s+/g, ' ')
+}
+
+export interface CatalogTool {
+  matchKey: string
+  description: string
+  partNumber: string
+  photos: PhotoEvidence[]
+}
+
+export interface CatalogMaterial {
+  matchKey: string
+  description: string
+  partNumberOrReference: string
+  photos: PhotoEvidence[]
+}
+
+export interface CatalogPerson {
+  matchKey: string
+  nameAndJobTitle: string
+  licenseNumber: string
+  photos: PhotoEvidence[]
+}
+
+export interface Catalog {
+  tools: CatalogTool[]
+  materials: CatalogMaterial[]
+  personnel: CatalogPerson[]
+}
