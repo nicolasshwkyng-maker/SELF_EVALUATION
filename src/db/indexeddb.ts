@@ -184,8 +184,17 @@ export async function getAllBlobEntries(): Promise<{ key: string; blob: Blob }[]
 }
 
 export async function saveBlobFromDataUrl(key: string, dataUrl: string): Promise<void> {
-  const res = await fetch(dataUrl)
-  const blob = await res.blob()
+  // Use atob instead of fetch() — fetch(dataUrl) is unreliable in Safari PWA contexts.
+  const comma = dataUrl.indexOf(',')
+  const header = comma >= 0 ? dataUrl.slice(0, comma) : ''
+  const base64 = comma >= 0 ? dataUrl.slice(comma + 1) : dataUrl
+  const mime = header.match(/:(.*?);/)?.[1] ?? 'image/jpeg'
+  const binary = atob(base64)
+  const bytes = new Uint8Array(binary.length)
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i)
+  }
+  const blob = new Blob([bytes], { type: mime })
   await saveBlob(key, blob)
 }
 

@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react'
-import { Camera, ImageIcon, X, Pencil, Check, Loader2 } from 'lucide-react'
+import { Camera, ImageIcon, X, Pencil, Check, Loader2, ImageOff } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { PhotoEvidence } from '../types'
 import { MAX_PHOTOS_PER_ITEM } from '../types'
@@ -11,6 +11,8 @@ interface Props {
   onChange: (photos: PhotoEvidence[]) => void
 }
 
+type ThumbState = 'loading' | 'ready' | 'error'
+
 function PhotoThumb({ photo, onDelete, onCaptionChange }: {
   photo: PhotoEvidence
   onDelete: () => void
@@ -18,18 +20,31 @@ function PhotoThumb({ photo, onDelete, onCaptionChange }: {
 }) {
   const { t } = useTranslation()
   const [src, setSrc] = useState<string | null>(null)
+  const [thumbState, setThumbState] = useState<ThumbState>('loading')
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState(photo.caption)
 
   useEffect(() => {
-    let url: string
+    let url: string | undefined
+    let cancelled = false
+    setThumbState('loading')
+    setSrc(null)
     loadBlob(photo.thumbnailBlobKey).then((blob) => {
+      if (cancelled) return
       if (blob) {
         url = URL.createObjectURL(blob)
         setSrc(url)
+        setThumbState('ready')
+      } else {
+        setThumbState('error')
       }
+    }).catch(() => {
+      if (!cancelled) setThumbState('error')
     })
-    return () => { if (url) URL.revokeObjectURL(url) }
+    return () => {
+      cancelled = true
+      if (url) URL.revokeObjectURL(url)
+    }
   }, [photo.thumbnailBlobKey])
 
   const kb = (photo.sizeBytes / 1024).toFixed(0)
@@ -37,8 +52,13 @@ function PhotoThumb({ photo, onDelete, onCaptionChange }: {
 
   return (
     <div className="relative border border-gray-200 rounded-lg overflow-hidden bg-white">
-      {src ? (
+      {thumbState === 'ready' && src ? (
         <img src={src} alt={photo.caption || 'photo'} className="w-full aspect-square object-cover" />
+      ) : thumbState === 'error' ? (
+        <div className="w-full aspect-square bg-gray-100 flex flex-col items-center justify-center gap-1">
+          <ImageOff className="w-5 h-5 text-gray-400" />
+          <span className="text-xs text-gray-400">No disponible</span>
+        </div>
       ) : (
         <div className="w-full aspect-square bg-gray-100 flex items-center justify-center">
           <Loader2 className="w-5 h-5 text-gray-400 animate-spin" />
