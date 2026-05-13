@@ -58,22 +58,30 @@ export async function exportFormatA(inspection: Inspection, draft: boolean): Pro
   y = drawSectionHeader(p1, ctx, y, '1. COMPONENT IDENTIFICATION / IDENTIFICACION DEL COMPONENTE')
   y -= 4
   const c = inspection.componentId
-  const col2x = MARGIN + CONTENT_W * 0.45
+  const col2x   = MARGIN + CONTENT_W * 0.45
+  const colW1   = CONTENT_W * 0.45 - 4   // available width for left column values
+  const colW2   = CONTENT_W * 0.55 - 4   // available width for right column values
+
+  // Row 1 — Description / Manufacturer
   p1.drawText('DESCRIPTION / DESCRIPCION', { x: MARGIN, y, size: 6, font: ctx.bold, color: COLORS.black })
-  p1.drawText(sanitize(c.description), { x: MARGIN, y: y - 7, size: 7, font: ctx.regular, color: COLORS.black })
+  const descH = drawText(p1, sanitize(c.description), MARGIN, y - 7, 7, ctx.regular, COLORS.black, colW1)
   p1.drawText('MANUFACTURER / FABRICANTE', { x: col2x, y, size: 6, font: ctx.bold, color: COLORS.black })
-  p1.drawText(sanitize(c.manufacturer), { x: col2x, y: y - 7, size: 7, font: ctx.regular, color: COLORS.black })
-  y -= 16
+  const mfgH  = drawText(p1, sanitize(c.manufacturer), col2x, y - 7, 7, ctx.regular, COLORS.black, colW2)
+  y -= 7 + Math.max(descH, mfgH) + 4
+
+  // Row 2 — Part Number / Scope
   p1.drawText('PART NUMBER / PARTE NUMERO', { x: MARGIN, y, size: 6, font: ctx.bold, color: COLORS.black })
-  p1.drawText(sanitize(c.partNumber), { x: MARGIN, y: y - 7, size: 7, font: ctx.regular, color: COLORS.black })
+  const pnH    = drawText(p1, sanitize(c.partNumber), MARGIN, y - 7, 7, ctx.regular, COLORS.black, colW1)
   p1.drawText('SCOPE / ALCANCE', { x: col2x, y, size: 6, font: ctx.bold, color: COLORS.black })
-  p1.drawText(sanitize(c.scope), { x: col2x, y: y - 7, size: 7, font: ctx.regular, color: COLORS.black })
-  y -= 16
+  const scopeH = drawText(p1, sanitize(c.scope), col2x, y - 7, 7, ctx.regular, COLORS.black, colW2)
+  y -= 7 + Math.max(pnH, scopeH) + 4
+
+  // Row 3 — ATA / Applicable Equipment
   p1.drawText('ATA / ATA', { x: MARGIN, y, size: 6, font: ctx.bold, color: COLORS.black })
-  p1.drawText(sanitize(c.ata), { x: MARGIN, y: y - 7, size: 7, font: ctx.regular, color: COLORS.black })
+  const ataH   = drawText(p1, sanitize(c.ata), MARGIN, y - 7, 7, ctx.regular, COLORS.black, colW1)
   p1.drawText('APPLICABLE EQUIPMENT / EQUIPO APLICABLE', { x: col2x, y, size: 6, font: ctx.bold, color: COLORS.black })
-  p1.drawText(sanitize(c.applicableEquipment), { x: col2x, y: y - 7, size: 7, font: ctx.regular, color: COLORS.black })
-  y -= 14
+  const aeH    = drawText(p1, sanitize(c.applicableEquipment), col2x, y - 7, 7, ctx.regular, COLORS.black, colW2)
+  y -= 7 + Math.max(ataH, aeH) + 2
   y = drawVerifyRow(p1, ctx, y, c.verify)
 
   // Section 2.1 — Housing

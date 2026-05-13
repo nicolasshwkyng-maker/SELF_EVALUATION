@@ -188,6 +188,10 @@ export function sanitize(text: string): string {
     .replace(/Á/g, 'A').replace(/É/g, 'E').replace(/Í/g, 'I').replace(/Ó/g, 'O').replace(/Ú/g, 'U')
     .replace(/ñ/g, 'n').replace(/Ñ/g, 'N').replace(/ü/g, 'u').replace(/Ü/g, 'U')
     .replace(/¿/g, '').replace(/¡/g, '')
+    .replace(/[–—]/g, '-')   // en-dash / em-dash → hyphen
+    .replace(/[‘’]/g, "'")   // curly single quotes → straight
+    .replace(/[“”]/g, '"')   // curly double quotes → straight
+    .replace(/°/g, ' ')           // degree symbol → space (in calibration dates)
     .replace(/[^\x00-\xFF]/g, '?')
 }
 
