@@ -183,16 +183,17 @@ export function drawVerifyRow(page: PDFPage, ctx: PdfCtx, y: number, value: Comp
 }
 
 export function sanitize(text: string): string {
-  return (text ?? '')
-    .replace(/á/g, 'a').replace(/é/g, 'e').replace(/í/g, 'i').replace(/ó/g, 'o').replace(/ú/g, 'u')
-    .replace(/Á/g, 'A').replace(/É/g, 'E').replace(/Í/g, 'I').replace(/Ó/g, 'O').replace(/Ú/g, 'U')
-    .replace(/ñ/g, 'n').replace(/Ñ/g, 'N').replace(/ü/g, 'u').replace(/Ü/g, 'U')
-    .replace(/¿/g, '').replace(/¡/g, '')
-    .replace(/[–—]/g, '-')   // en-dash / em-dash → hyphen
-    .replace(/[‘’]/g, "'")   // curly single quotes → straight
-    .replace(/[“”]/g, '"')   // curly double quotes → straight
-    .replace(/°/g, ' ')           // degree symbol → space (in calibration dates)
-    .replace(/[^\x00-\xFF]/g, '?')
+  return (text ?? ‘’)
+    .replace(/[\r\n\t]+/g, ‘ ‘)    // newlines / tabs → space (pdf-lib rejects \n in drawText)
+    .replace(/á/g, ‘a’).replace(/é/g, ‘e’).replace(/í/g, ‘i’).replace(/ó/g, ‘o’).replace(/ú/g, ‘u’)
+    .replace(/Á/g, ‘A’).replace(/É/g, ‘E’).replace(/Í/g, ‘I’).replace(/Ó/g, ‘O’).replace(/Ú/g, ‘U’)
+    .replace(/ñ/g, ‘n’).replace(/Ñ/g, ‘N’).replace(/ü/g, ‘u’).replace(/Ü/g, ‘U’)
+    .replace(/¿/g, ‘’).replace(/¡/g, ‘’)
+    .replace(/[–—]/g, ‘-’)   // en-dash / em-dash → hyphen
+    .replace(/[‘’]/g, “’”)   // curly single quotes → straight
+    .replace(/[“”]/g, ‘”’)   // curly double quotes → straight
+    .replace(/°/g, ‘ ‘)      // degree symbol → space
+    .replace(/[^\x00-\xFF]/g, ‘?’)
 }
 
 export function drawDraftWatermark(page: PDFPage, ctx: PdfCtx) {
