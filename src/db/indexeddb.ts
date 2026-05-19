@@ -45,7 +45,14 @@ export function createEmptyCatalog(): Catalog {
 export async function loadCatalog(): Promise<Catalog> {
   const db = await getDB()
   const data = await db.get(CATALOG_STORE, CATALOG_KEY)
-  return data ?? createEmptyCatalog()
+  // Guard against corrupted catalog (e.g. {} without required arrays)
+  const empty = createEmptyCatalog()
+  if (!data) return empty
+  return {
+    tools:      Array.isArray(data.tools)     ? data.tools     : empty.tools,
+    materials:  Array.isArray(data.materials)  ? data.materials  : empty.materials,
+    personnel:  Array.isArray(data.personnel)  ? data.personnel  : empty.personnel,
+  }
 }
 
 export async function saveCatalog(catalog: Catalog): Promise<void> {

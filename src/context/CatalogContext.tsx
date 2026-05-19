@@ -54,7 +54,12 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const setCatalog = useCallback(
-    (c: Catalog) => applyUpdate(() => c),
+    (c: Catalog) => applyUpdate(() => ({
+      // Sanitize: ensure all required arrays are present even if c is {} or partial
+      tools:     Array.isArray(c?.tools)     ? c.tools     : [],
+      materials: Array.isArray(c?.materials) ? c.materials : [],
+      personnel: Array.isArray(c?.personnel) ? c.personnel : [],
+    })),
     [applyUpdate],
   )
 
@@ -62,9 +67,9 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
     (inspection: Inspection) => {
       applyUpdate((prev) => {
         const next: Catalog = {
-          tools: [...prev.tools],
-          materials: [...prev.materials],
-          personnel: [...prev.personnel],
+          tools:     Array.isArray(prev?.tools)     ? [...prev.tools]     : [],
+          materials: Array.isArray(prev?.materials) ? [...prev.materials] : [],
+          personnel: Array.isArray(prev?.personnel) ? [...prev.personnel] : [],
         }
 
         for (const t of inspection.tools) {
