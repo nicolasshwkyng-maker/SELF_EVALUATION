@@ -1,6 +1,6 @@
-import { useRef } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { FolderOpen } from 'lucide-react'
+import { FolderOpen, ArrowUp } from 'lucide-react'
 import { useInspection } from '../context/InspectionContext'
 import ProgressBar from './ProgressBar'
 import LanguageToggle from './LanguageToggle'
@@ -32,13 +32,24 @@ export default function Layout({ children, currentSection, onSectionChange, onIm
   const { t } = useTranslation()
   const { inspection, saveStatus } = useInspection()
   const importRef = useRef<HTMLInputElement>(null)
+  const [showScrollTop, setShowScrollTop] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => setShowScrollTop(window.scrollY > 200)
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' })
 
   const statusColor = saveStatus === 'saved' ? 'text-green-300' : saveStatus === 'saving' ? 'text-yellow-300' : saveStatus === 'error' ? 'text-red-300' : 'text-slate-400'
 
   return (
     <div className="min-h-dvh flex flex-col bg-slate-50">
+      {/* Header + Nav sticky wrapper */}
+      <div className="sticky top-0 z-20 shadow-lg">
       {/* Header */}
-      <header className="bg-slate-900 text-white sticky top-0 z-10 shadow-lg">
+      <header className="bg-slate-900 text-white">
         <div className="max-w-3xl mx-auto px-3 py-2">
           <div className="flex items-center justify-between gap-2 mb-2">
             <div>
@@ -96,11 +107,24 @@ export default function Layout({ children, currentSection, onSectionChange, onIm
           ))}
         </div>
       </nav>
+      </div>{/* end sticky wrapper */}
 
       {/* Content */}
       <main className="flex-1 max-w-3xl w-full mx-auto px-3 py-4">
         {children}
       </main>
+
+      {/* Scroll-to-top button */}
+      {showScrollTop && (
+        <button
+          type="button"
+          onClick={scrollToTop}
+          aria-label="Ir arriba"
+          className="fixed bottom-20 right-4 z-30 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-full w-11 h-11 flex items-center justify-center shadow-lg transition-all duration-200"
+        >
+          <ArrowUp className="w-5 h-5" />
+        </button>
+      )}
 
       {/* Bottom nav */}
       <div className="sticky bottom-0 bg-white border-t border-gray-200 shadow-up">
