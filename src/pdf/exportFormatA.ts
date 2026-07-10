@@ -4,7 +4,7 @@ import { buildFigureMap } from '../utils/figureNumbering'
 import {
   createPdfCtx, addPage, drawHeaderBox, drawSectionHeader, drawText, drawCompliance,
   drawVerifyRow, drawDraftWatermark, sanitize,
-  MARGIN, CONTENT_W, PAGE_H, COLORS,
+  MARGIN, CONTENT_W, PAGE_H, HEADER_H, COLORS,
 } from './pdfHelpers'
 import { buildPhotoAnnex } from './photoAnnex'
 import logoSrc from '../assets/satena-logo.png'
@@ -51,13 +51,13 @@ export async function exportFormatA(inspection: Inspection, draft: boolean): Pro
   function ensure(needed: number): void {
     if (y - needed < MIN_Y) {
       cur = newPage()
-      y = PAGE_H - MARGIN - 30
+      y = PAGE_H - MARGIN - HEADER_H - 3
     }
   }
 
   // ── PAGE 1 ──────────────────────────────────────────────────────────────
   cur = newPage()
-  y = PAGE_H - MARGIN - 30
+  y = PAGE_H - MARGIN - HEADER_H - 3
 
   // Section 0 — Administrative
   y = drawSectionHeader(cur, ctx, y, '0. ADMINISTRATIVE SECTION / SECCION ADMINISTRATIVA')
@@ -158,7 +158,7 @@ export async function exportFormatA(inspection: Inspection, draft: boolean): Pro
 
   // ── Section 3 — Equipment (Tools) — FLOWING across pages ────────────────
   cur = newPage()
-  y = PAGE_H - MARGIN - 30
+  y = PAGE_H - MARGIN - HEADER_H - 3
 
   const tDesc = MARGIN
   const tPn   = MARGIN + CONTENT_W * 0.28
@@ -185,7 +185,7 @@ export async function exportFormatA(inspection: Inspection, draft: boolean): Pro
     const rowH = 9
     if (y - rowH < MIN_Y) {
       cur = newPage()
-      y = PAGE_H - MARGIN - 30
+      y = PAGE_H - MARGIN - HEADER_H - 3
       y = drawSectionHeader(cur, ctx, y, '3. EQUIPMENT (CONT.) / EQUIPOS (CONT.)')
       y -= 2
       y = drawToolsTableHeader(cur, y)
@@ -242,7 +242,7 @@ export async function exportFormatA(inspection: Inspection, draft: boolean): Pro
     const rowH = 9
     if (y - rowH < MIN_Y) {
       cur = newPage()
-      y = PAGE_H - MARGIN - 30
+      y = PAGE_H - MARGIN - HEADER_H - 3
       y = drawSectionHeader(cur, ctx, y, '4. MATERIAL (CONT.) / MATERIAL (CONT.)')
       y -= 2
       y = drawMaterialsTableHeader(cur, y)
@@ -385,7 +385,7 @@ export async function exportFormatA(inspection: Inspection, draft: boolean): Pro
 
   // ── Contract + Signatures — always start on a new page ──────────────────
   cur = newPage()
-  y = PAGE_H - MARGIN - 30
+  y = PAGE_H - MARGIN - HEADER_H - 3
 
   // Section 9 — Contract Maintenance
   y = drawSectionHeader(cur, ctx, y, '9. CONTRACT MAINTENANCE / MANTENIMIENTO CONTRATADO')
@@ -482,7 +482,7 @@ export async function exportFormatA(inspection: Inspection, draft: boolean): Pro
   const totalPages = totalBodyPages + annexPages
 
   bodyPages.forEach((pg, i) => {
-    drawHeaderBox(pg, ctx, i + 1, totalPages, i === 0 ? logoImage : undefined)
+    drawHeaderBox(pg, ctx, i + 1, totalPages, logoImage)
     if (draft) drawDraftWatermark(pg, ctx)
   })
 

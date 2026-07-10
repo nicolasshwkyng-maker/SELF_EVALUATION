@@ -42,7 +42,7 @@ export function addPage(ctx: PdfCtx): { page: PDFPage; y: () => number; setY: (v
 
 const LOGO_COL_W = 72  // width of the logo column when a logo is present
 const CODE_COL_W = 110 // width of the document-control column (right)
-const HEADER_H = 32    // header height (slightly taller to fit logo proportionally)
+export const HEADER_H = 32  // header height — exported so exporters can compute content start Y
 
 export function drawHeaderBox(
   page: PDFPage,
