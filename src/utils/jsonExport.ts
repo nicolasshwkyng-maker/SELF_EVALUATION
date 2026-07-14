@@ -91,33 +91,27 @@ export async function exportToJson(inspection: Inspection, catalog?: Catalog): P
 }
 
 export async function importFromJson(file: File): Promise<ImportResult> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = async () => {
-      try {
-        const payload = JSON.parse(reader.result as string) as ExportPayload
-        if (!payload.inspection) throw new Error('Archivo inválido: falta inspection')
+  let text: string
+  try {
+    text = await file.text()
+  } catch {
+    throw new Error('No se pudo leer el archivo. Asegúrese de que esté descargado localmente (no solo en la nube).')
+  }
 
-        // Re-save inspection photo blobs
-        for (const photo of payload.photos ?? []) {
-          if (photo.dataUrl) await saveBlobFromDataUrl(photo.blobKey, photo.dataUrl)
-          if (photo.thumbDataUrl) await saveBlobFromDataUrl(photo.thumbnailBlobKey, photo.thumbDataUrl)
-        }
+  const payload = JSON.parse(text) as ExportPayload
+  if (!payload.inspection) throw new Error('Archivo inválido: falta inspection')
 
-        // Re-save catalog photo blobs
-        for (const photo of payload.catalogPhotos ?? []) {
-          if (photo.dataUrl) await saveBlobFromDataUrl(photo.blobKey, photo.dataUrl)
-          if (photo.thumbDataUrl) await saveBlobFromDataUrl(photo.thumbnailBlobKey, photo.thumbDataUrl)
-        }
+  for (const photo of payload.photos ?? []) {
+    if (photo.dataUrl) await saveBlobFromDataUrl(photo.blobKey, photo.dataUrl)
+    if (photo.thumbDataUrl) await saveBlobFromDataUrl(photo.thumbnailBlobKey, photo.thumbDataUrl)
+  }
 
-        resolve({ inspection: payload.inspection, catalog: payload.catalog ?? null })
-      } catch (e) {
-        reject(e)
-      }
-    }
-    reader.onerror = reject
-    reader.readAsText(file)
-  })
+  for (const photo of payload.catalogPhotos ?? []) {
+    if (photo.dataUrl) await saveBlobFromDataUrl(photo.blobKey, photo.dataUrl)
+    if (photo.thumbDataUrl) await saveBlobFromDataUrl(photo.thumbnailBlobKey, photo.thumbDataUrl)
+  }
+
+  return { inspection: payload.inspection, catalog: payload.catalog ?? null }
 }
 
 /** Remove / replace characters that are illegal in filenames on any OS. */
