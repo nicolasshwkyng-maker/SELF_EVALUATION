@@ -322,7 +322,7 @@ export async function exportFormatA(inspection: Inspection, draft: boolean): Pro
   y -= 2
 
   const pName  = MARGIN
-  const pLic   = MARGIN + CONTENT_W * 0.38
+  const pLic   = MARGIN + CONTENT_W * 0.43
   const pTrain = MARGIN + CONTENT_W * 0.58
   const pYes   = MARGIN + CONTENT_W * 0.82
   const pNo    = MARGIN + CONTENT_W * 0.91
@@ -343,7 +343,7 @@ export async function exportFormatA(inspection: Inspection, draft: boolean): Pro
     const rowH = 9
     ensure(rowH)
     cur.drawRectangle({ x: MARGIN, y: y - rowH, width: CONTENT_W, height: rowH, borderColor: COLORS.darkGray, borderWidth: 0.2, color: COLORS.white })
-    cur.drawText(sanitize(per.nameAndJobTitle.slice(0, 30)),         { x: pName + 1,  y: y - 6.5, size: 5.5, font: ctx.regular, color: COLORS.black })
+    cur.drawText(sanitize(per.nameAndJobTitle),                      { x: pName + 1,  y: y - 6.5, size: 5.5, font: ctx.regular, color: COLORS.black })
     cur.drawText(sanitize(per.licenseNumber.slice(0, 15)),           { x: pLic + 1,   y: y - 6.5, size: 5.5, font: ctx.regular, color: COLORS.black })
     cur.drawText(sanitize((per.specificTraining || '').slice(0, 30)), { x: pTrain + 1, y: y - 6.5, size: 5.5, font: ctx.regular, color: COLORS.black })
     if (per.compliance === 'yes') cur.drawText('X', { x: pYes + 3, y: y - 6.5, size: 7, font: ctx.bold, color: COLORS.black })
