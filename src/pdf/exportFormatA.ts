@@ -456,6 +456,10 @@ export async function exportFormatA(inspection: Inspection, draft: boolean): Pro
   if (inspection.signatures?.qualityControlApproved === 'no') cur.drawText('X', { x: sig2x + 37, y: y - 46, size: 7, font: ctx.bold, color: COLORS.black })
   cur.drawText('NO / NO', { x: sig2x + 45, y: y - 46, size: 5.5, font: ctx.regular, color: COLORS.black })
   cur.drawText('SIGNATURE / FIRMA:', { x: sig2x + 2, y: y - 56, size: 5, font: ctx.bold, color: COLORS.black })
+  // DATE/FECHA en la misma línea — valor = fecha auditoría QA − 3 días
+  const qcDate = new Date(); qcDate.setDate(qcDate.getDate() - 3)
+  cur.drawText('DATE / FECHA:', { x: sig2x + 55, y: y - 56, size: 5, font: ctx.bold, color: COLORS.black })
+  cur.drawText(formatDate(qcDate.toISOString()), { x: sig2x + 93, y: y - 56, size: 5, font: ctx.regular, color: COLORS.black })
   y -= 68
 
   // Quality Assurance audit box (full width)
