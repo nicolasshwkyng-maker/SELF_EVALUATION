@@ -10,7 +10,10 @@ const LABEL_W = 110
 
 function formatDate(iso: string): string {
   if (!iso) return ''
-  try { return new Date(iso).toLocaleDateString('es-CO') } catch { return iso }
+  const datePart = iso.split('T')[0]
+  const parts = datePart.split('-')
+  if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`
+  return iso
 }
 function formatTs(iso: string): string {
   if (!iso) return ''
