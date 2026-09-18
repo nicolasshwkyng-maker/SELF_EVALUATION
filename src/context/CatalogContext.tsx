@@ -56,9 +56,10 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
   const setCatalog = useCallback(
     (c: Catalog) => applyUpdate(() => ({
       // Sanitize: ensure all required arrays are present even if c is {} or partial
-      tools:     Array.isArray(c?.tools)     ? c.tools     : [],
-      materials: Array.isArray(c?.materials) ? c.materials : [],
-      personnel: Array.isArray(c?.personnel) ? c.personnel : [],
+      // Also ensure each item has a photos array (older JSONs may omit it on personnel)
+      tools:     Array.isArray(c?.tools)     ? c.tools.map((t) => ({ ...t, photos: t.photos ?? [] }))     : [],
+      materials: Array.isArray(c?.materials) ? c.materials.map((m) => ({ ...m, photos: m.photos ?? [] })) : [],
+      personnel: Array.isArray(c?.personnel) ? c.personnel.map((p) => ({ ...p, photos: p.photos ?? [] })) : [],
     })),
     [applyUpdate],
   )

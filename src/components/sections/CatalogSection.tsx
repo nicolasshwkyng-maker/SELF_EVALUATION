@@ -46,10 +46,10 @@ function ToolsTab() {
               <p className="text-sm font-semibold text-slate-800 truncate">{tool.description || '—'}</p>
               <p className="text-xs text-gray-500 font-mono">{tool.partNumber || '—'}</p>
             </div>
-            <PhotoBadge count={tool.photos.length} />
+            <PhotoBadge count={tool.photos?.length ?? 0} />
           </div>
           <PhotoCapture
-            photos={tool.photos}
+            photos={tool.photos ?? []}
             onChange={(photos: PhotoEvidence[]) => updateToolPhotos(tool.matchKey, photos)}
           />
         </div>
@@ -73,10 +73,10 @@ function MaterialsTab() {
               <p className="text-sm font-semibold text-slate-800 truncate">{mat.description || '—'}</p>
               <p className="text-xs text-gray-500 font-mono">{mat.partNumberOrReference || '—'}</p>
             </div>
-            <PhotoBadge count={mat.photos.length} />
+            <PhotoBadge count={mat.photos?.length ?? 0} />
           </div>
           <PhotoCapture
-            photos={mat.photos}
+            photos={mat.photos ?? []}
             onChange={(photos: PhotoEvidence[]) => updateMaterialPhotos(mat.matchKey, photos)}
           />
         </div>
@@ -102,10 +102,10 @@ function PersonnelTab() {
                 <p className="text-xs text-gray-500">Licencia: {person.licenseNumber}</p>
               )}
             </div>
-            <PhotoBadge count={person.photos.length} />
+            <PhotoBadge count={person.photos?.length ?? 0} />
           </div>
           <PhotoCapture
-            photos={person.photos}
+            photos={person.photos ?? []}
             onChange={(photos: PhotoEvidence[]) => updatePersonPhotos(person.matchKey, photos)}
           />
         </div>
@@ -126,9 +126,9 @@ export default function CatalogSection() {
   }
 
   const photoCounts: Record<TabId, number> = {
-    tools: catalog.tools.reduce((s, t) => s + t.photos.length, 0),
-    materials: catalog.materials.reduce((s, m) => s + m.photos.length, 0),
-    personnel: catalog.personnel.reduce((s, p) => s + p.photos.length, 0),
+    tools: catalog.tools.reduce((s, t) => s + (t.photos?.length ?? 0), 0),
+    materials: catalog.materials.reduce((s, m) => s + (m.photos?.length ?? 0), 0),
+    personnel: catalog.personnel.reduce((s, p) => s + (p.photos?.length ?? 0), 0),
   }
 
   return (
