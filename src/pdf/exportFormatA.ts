@@ -1,4 +1,4 @@
-import type { Inspection } from '../types'
+import type { Inspection, ValidationQuestion } from '../types'
 import type { PDFPage } from 'pdf-lib'
 import { buildFigureMap } from '../utils/figureNumbering'
 import {
@@ -70,10 +70,10 @@ export async function exportFormatA(inspection: Inspection, draft: boolean): Pro
   cur.drawText(sanitize(inspection.admin.responsibleForRequest), { x: MARGIN, y: y - 8, size: 7, font: ctx.regular, color: COLORS.black })
   y -= 18
   cur.drawText('RATING / CAPACIDAD', { x: MARGIN, y, size: 6, font: ctx.bold, color: COLORS.black })
-  cur.drawText(sanitize(inspection.admin.rating), { x: MARGIN, y: y - 8, size: 7, font: ctx.regular, color: COLORS.black })
+  const ratingH = drawText(cur, inspection.admin.rating, MARGIN, y - 8, 7, ctx.regular, COLORS.black, CONTENT_W * 0.6 - 8)
   cur.drawText('VERIFY / VERIFICADO', { x: MARGIN + CONTENT_W * 0.6, y, size: 6, font: ctx.bold, color: COLORS.black })
   drawCompliance(cur, ctx, inspection.admin.ratingVerify, MARGIN + CONTENT_W * 0.6, y - 6)
-  y -= 20
+  y -= Math.max(20, 8 + ratingH + 5)
 
   // Section 1 — Component Identification
   y = drawSectionHeader(cur, ctx, y, '1. COMPONENT IDENTIFICATION / IDENTIFICACION DEL COMPONENTE')
@@ -200,8 +200,23 @@ export async function exportFormatA(inspection: Inspection, draft: boolean): Pro
   ensure(13)
   y = drawVerifyRow(cur, ctx, y, inspection.sectionVerify.tools)
 
+  const qFs = 5.5
+  const qTextW = CONTENT_W - 70
+  const questionRowH = (q: { questionEn: string; questionEs: string }) =>
+    12 + (Math.max(wrapLines(`${q.questionEn} / ${q.questionEs}`, ctx.regular, qFs, qTextW).length, 1) - 1) * (qFs + 1.5)
+
+  function drawQuestionRow(q: ValidationQuestion, i: number) {
+    const rowH = questionRowH(q)
+    cur.drawRectangle({ x: MARGIN, y: y - rowH + 1, width: CONTENT_W, height: rowH, borderColor: COLORS.darkGray, borderWidth: 0.2, color: COLORS.white })
+    cur.drawText(`${i + 1}-`, { x: MARGIN + 2, y: y - 8, size: 6, font: ctx.bold, color: COLORS.black })
+    drawText(cur, `${q.questionEn} / ${q.questionEs}`, MARGIN + 12, y - 5, qFs, ctx.regular, COLORS.black, qTextW)
+    if (q.answer === 'yes') cur.drawText('X', { x: MARGIN + CONTENT_W - 47, y: y - 8, size: 7, font: ctx.bold, color: COLORS.black })
+    if (q.answer === 'no')  cur.drawText('X', { x: MARGIN + CONTENT_W - 25, y: y - 8, size: 7, font: ctx.bold, color: COLORS.black })
+    y -= rowH + 1
+  }
+
   // 3.1 Validation
-  ensure(13 + 13 * inspection.toolsValidation.length + 20)
+  ensure(13 + inspection.toolsValidation.reduce((s, q) => s + questionRowH(q) + 1, 0) + 20)
   y = drawSectionHeader(cur, ctx, y, '3.1 PREGUNTAS DE VALIDACION / VALIDATION QUESTION')
   y -= 2
   cur.drawRectangle({ x: MARGIN, y: y - 11, width: CONTENT_W, height: 12, color: COLORS.lightGray })
@@ -209,14 +224,7 @@ export async function exportFormatA(inspection: Inspection, draft: boolean): Pro
   cur.drawText('YES / SI', { x: MARGIN + CONTENT_W - 52, y: y - 10, size: 4.5, font: ctx.regular, color: COLORS.black })
   cur.drawText('NO / NO', { x: MARGIN + CONTENT_W - 30, y: y - 10, size: 4.5, font: ctx.regular, color: COLORS.black })
   y -= 13
-  inspection.toolsValidation.forEach((q, i) => {
-    cur.drawRectangle({ x: MARGIN, y: y - 11, width: CONTENT_W, height: 12, borderColor: COLORS.darkGray, borderWidth: 0.2, color: COLORS.white })
-    cur.drawText(`${i + 1}-`, { x: MARGIN + 2, y: y - 8, size: 6, font: ctx.bold, color: COLORS.black })
-    drawText(cur, `${q.questionEn} / ${q.questionEs}`, MARGIN + 12, y - 5, 5.5, ctx.regular, COLORS.black, CONTENT_W - 70)
-    if (q.answer === 'yes') cur.drawText('X', { x: MARGIN + CONTENT_W - 47, y: y - 8, size: 7, font: ctx.bold, color: COLORS.black })
-    if (q.answer === 'no')  cur.drawText('X', { x: MARGIN + CONTENT_W - 25, y: y - 8, size: 7, font: ctx.bold, color: COLORS.black })
-    y -= 13
-  })
+  inspection.toolsValidation.forEach(drawQuestionRow)
 
   // ── Section 4 — Material — FLOWING across pages ──────────────────────────
   ensure(26)
@@ -370,13 +378,8 @@ export async function exportFormatA(inspection: Inspection, draft: boolean): Pro
   cur.drawText('NO / NO',  { x: MARGIN + CONTENT_W - 30, y: y - 10, size: 4.5, font: ctx.regular, color: COLORS.black })
   y -= 13
   inspection.personnelValidation.forEach((q, i) => {
-    ensure(13)
-    cur.drawRectangle({ x: MARGIN, y: y - 11, width: CONTENT_W, height: 12, borderColor: COLORS.darkGray, borderWidth: 0.2, color: COLORS.white })
-    cur.drawText(`${i + 1}-`, { x: MARGIN + 2, y: y - 8, size: 6, font: ctx.bold, color: COLORS.black })
-    drawText(cur, `${q.questionEn} / ${q.questionEs}`, MARGIN + 12, y - 5, 5.5, ctx.regular, COLORS.black, CONTENT_W - 70)
-    if (q.answer === 'yes') cur.drawText('X', { x: MARGIN + CONTENT_W - 47, y: y - 8, size: 7, font: ctx.bold, color: COLORS.black })
-    if (q.answer === 'no')  cur.drawText('X', { x: MARGIN + CONTENT_W - 25, y: y - 8, size: 7, font: ctx.bold, color: COLORS.black })
-    y -= 13
+    ensure(questionRowH(q) + 1)
+    drawQuestionRow(q, i)
   })
 
   // Section 8 — Observations
