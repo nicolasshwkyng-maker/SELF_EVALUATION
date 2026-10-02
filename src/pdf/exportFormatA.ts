@@ -490,20 +490,16 @@ export async function exportFormatA(inspection: Inspection, draft: boolean): Pro
   cur.drawText(formatDate(new Date().toISOString()), { x: MARGIN + 50, y: y - 62, size: 6, font: ctx.regular, color: COLORS.black })
   cur.drawText('SIGNATURE / FIRMA:', { x: MARGIN + 3, y: y - 75, size: 5.5, font: ctx.bold, color: COLORS.black })
 
-  // ── Stamp headers on all body pages (two-pass) ───────────────────────────
-  const totalBodyPages = bodyPages.length
-  const annexPages = Math.ceil(figures.length / 2)
-  const totalPages = totalBodyPages + annexPages
-
-  bodyPages.forEach((pg, i) => {
-    drawHeaderBox(pg, ctx, i + 1, totalPages, logoImage)
+  bodyPages.forEach((pg) => {
     if (draft) drawDraftWatermark(pg, ctx)
   })
 
-  // Photo annex
-  if (figures.length > 0) {
-    await buildPhotoAnnex(ctx, figures, draft, totalBodyPages, totalPages, logoImage)
-  }
+  // Photo annex (photos + PDF evidence pages)
+  const annexPages = await buildPhotoAnnex(ctx, figures, draft)
+
+  // ── Stamp headers once the real page count is known ──────────────────────
+  const allPages = [...bodyPages, ...annexPages]
+  allPages.forEach((pg, i) => drawHeaderBox(pg, ctx, i + 1, allPages.length, logoImage))
 
   return ctx.doc.save()
 }

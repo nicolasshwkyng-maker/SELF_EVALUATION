@@ -2,7 +2,6 @@ import { useRef, useState, useEffect } from 'react'
 import { Camera, ImageIcon, X, Pencil, Check, Loader2, ImageOff } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { PhotoEvidence } from '../types'
-import { MAX_PHOTOS_PER_ITEM } from '../types'
 import { processImageFile } from '../utils/imageProcessing'
 import { loadBlob, deleteBlob } from '../db/indexeddb'
 
@@ -109,15 +108,20 @@ export default function PhotoCapture({ photos, onChange }: Props) {
   const cameraRef = useRef<HTMLInputElement>(null)
   const galleryRef = useRef<HTMLInputElement>(null)
   const [processing, setProcessing] = useState(false)
-  const atLimit = photos.length >= MAX_PHOTOS_PER_ITEM
 
   const handleFiles = async (files: FileList | null) => {
     if (!files || files.length === 0) return
     setProcessing(true)
     try {
-      const remaining = MAX_PHOTOS_PER_ITEM - photos.length
-      const toProcess = Array.from(files).slice(0, remaining)
-      const newPhotos = await Promise.all(toProcess.map(processImageFile))
+      // Sequential so large batches don't spawn dozens of compression workers at once on mobile.
+      const newPhotos: PhotoEvidence[] = []
+      for (const file of Array.from(files)) {
+        try {
+          newPhotos.push(await processImageFile(file))
+        } catch (e) {
+          console.error('Error processing image:', file.name, e)
+        }
+      }
       onChange([...photos, ...newPhotos])
     } catch (e) {
       console.error('Error processing image:', e)
@@ -142,9 +146,8 @@ export default function PhotoCapture({ photos, onChange }: Props) {
       <div className="flex gap-2 mb-2">
         <button
           type="button"
-          disabled={atLimit || processing}
+          disabled={processing}
           onClick={() => cameraRef.current?.click()}
-          title={atLimit ? t('photo.limitReached') : undefined}
           className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg disabled:opacity-40 hover:bg-blue-700 transition-colors"
         >
           {processing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
@@ -152,17 +155,13 @@ export default function PhotoCapture({ photos, onChange }: Props) {
         </button>
         <button
           type="button"
-          disabled={atLimit || processing}
+          disabled={processing}
           onClick={() => galleryRef.current?.click()}
-          title={atLimit ? t('photo.limitReached') : undefined}
           className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-slate-600 text-white rounded-lg disabled:opacity-40 hover:bg-slate-700 transition-colors"
         >
           <ImageIcon className="w-4 h-4" />
           {t('photo.gallery')}
         </button>
-        {atLimit && (
-          <span className="text-xs text-amber-600 self-center">{t('photo.limitReached')}</span>
-        )}
       </div>
 
       <input

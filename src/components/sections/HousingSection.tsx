@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { useInspection } from '../../context/InspectionContext'
 import ComplianceToggle from '../ComplianceToggle'
 import PhotoCapture from '../PhotoCapture'
+import PdfCapture from '../PdfCapture'
 import type { HousingFacilityItem, PhotoEvidence } from '../../types'
 
 interface ItemCardProps {
@@ -43,6 +44,7 @@ function ItemCard({ item, index, onChange }: ItemCardProps) {
         photos={item.photos}
         onChange={(photos: PhotoEvidence[]) => onChange({ ...item, photos })}
       />
+      <PdfCapture pdfs={item.pdfs ?? []} onChange={(pdfs) => onChange({ ...item, pdfs })} />
     </div>
   )
 }

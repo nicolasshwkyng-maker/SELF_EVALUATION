@@ -34,11 +34,34 @@
   "photo": {
     "camera": "Cámara",
     "gallery": "Galería",
-    "limitReached": "Límite alcanzado — elimina una foto para añadir más",
     "caption": "Descripción (opcional)",
     "delete": "Eliminar foto",
     "edit": "Editar descripción",
     "save": "Guardar"
+  },
+
+  "pdf": {
+    "add": "PDF",
+    "processing": "Procesando PDF…",
+    "invalid": "No se pudo leer el PDF (¿está dañado o protegido con contraseña?)",
+    "pages": "{{count}} pág.",
+    "pages_other": "{{count}} págs.",
+    "delete": "Eliminar PDF",
+    "view": "Ver PDF",
+    "openOriginal": "Abrir original"
+  },
+
+  "gallery": {
+    "title": "10. Catálogo de evidencias",
+    "subtitle": "Vista de solo lectura de las fotografías y PDF cargados en esta autoevaluación. Para agregar o eliminar evidencias, hazlo desde cada ítem.",
+    "all": "Todas",
+    "photos": "Fotos",
+    "pdfs": "PDF",
+    "pdfPages": "Páginas PDF",
+    "empty": "Aún no hay evidencias cargadas en esta autoevaluación.",
+    "emptyFilter": "No hay evidencias de este tipo.",
+    "goToItem": "Ir al ítem",
+    "close": "Cerrar"
   },
 
   "common": {

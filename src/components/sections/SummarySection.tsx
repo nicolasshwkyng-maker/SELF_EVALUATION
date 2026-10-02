@@ -2,11 +2,11 @@ import { useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FileText, Download, Upload, PlusCircle, AlertTriangle, CheckCircle } from 'lucide-react'
 import { useInspection } from '../../context/InspectionContext'
-import { useCatalog } from '../../context/CatalogContext'
 import { exportToJson, importFromJson, triggerPdfDownload, safeFilename } from '../../utils/jsonExport'
 import { exportFormatA } from '../../pdf/exportFormatA'
 import { exportFormatB } from '../../pdf/exportFormatB'
 import { deleteInspection, createEmptyInspection } from '../../db/indexeddb'
+import { listEvidenceItems } from '../../utils/figureNumbering'
 
 function getWarnings(inspection: ReturnType<typeof useInspection>['inspection']): string[] {
   if (!inspection) return []
@@ -46,10 +46,13 @@ function countPhotos(inspection: NonNullable<ReturnType<typeof useInspection>['i
   ].reduce((sum, item) => sum + (item.photos?.length ?? 0), 0)
 }
 
+function countPdfs(inspection: NonNullable<ReturnType<typeof useInspection>['inspection']>): number {
+  return listEvidenceItems(inspection).reduce((sum, item) => sum + item.pdfs.length, 0)
+}
+
 export default function SummarySection({ onSectionChange }: { onSectionChange: (i: number) => void }) {
   const { t } = useTranslation()
   const { inspection, update, setInspection } = useInspection()
-  const { catalog, setCatalog, syncFromInspection } = useCatalog()
   const [pdfFormat, setPdfFormat] = useState<'A' | 'B'>('A')
   const [showWarnings, setShowWarnings] = useState(false)
   const [exporting, setExporting] = useState(false)
@@ -60,6 +63,7 @@ export default function SummarySection({ onSectionChange }: { onSectionChange: (
 
   const warnings = getWarnings(inspection)
   const totalPhotos = countPhotos(inspection)
+  const totalPdfs = countPdfs(inspection)
 
   const doPdfExport = async (draft: boolean) => {
     setExporting(true)
@@ -88,7 +92,7 @@ export default function SummarySection({ onSectionChange }: { onSectionChange: (
 
   const handleExportJson = async () => {
     try {
-      await exportToJson(inspection, catalog)
+      await exportToJson(inspection)
     } catch (e) {
       console.error('JSON export error:', e)
     }
@@ -98,13 +102,7 @@ export default function SummarySection({ onSectionChange }: { onSectionChange: (
     if (!confirm(t('summary.importConfirm'))) return
     setImporting(true)
     try {
-      const { inspection: imported, catalog: importedCatalog } = await importFromJson(file)
-      setInspection(imported)
-      if (importedCatalog) {
-        setCatalog(importedCatalog)
-      } else {
-        syncFromInspection(imported)
-      }
+      setInspection(await importFromJson(file))
     } catch (e) {
       alert('Error al importar: ' + String(e))
     } finally {
@@ -125,10 +123,14 @@ export default function SummarySection({ onSectionChange }: { onSectionChange: (
       <h2 className="text-lg font-bold text-slate-800">{t('summary.title')}</h2>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-3 gap-3">
         <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
           <div className="text-2xl font-bold text-slate-800">{totalPhotos}</div>
           <div className="text-xs text-gray-500 mt-1">{t('summary.totalPhotos')}</div>
+        </div>
+        <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
+          <div className="text-2xl font-bold text-slate-800">{totalPdfs}</div>
+          <div className="text-xs text-gray-500 mt-1">{t('gallery.pdfs')}</div>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
           <div className="text-2xl font-bold text-slate-800">{warnings.length}</div>

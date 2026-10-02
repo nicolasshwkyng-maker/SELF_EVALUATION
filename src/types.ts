@@ -11,6 +11,17 @@ export interface PhotoEvidence {
   sizeBytes: number
 }
 
+export interface PdfEvidence {
+  id: string
+  blobKey: string
+  thumbnailBlobKey: string
+  fileName: string
+  pageCount: number
+  caption: string
+  timestamp: string
+  sizeBytes: number
+}
+
 export interface AdminSection {
   workshopName: string
   requestDate: string
@@ -36,6 +47,7 @@ export interface HousingFacilityItem {
   evidence: string
   compliance: ComplianceStatus
   photos: PhotoEvidence[]
+  pdfs?: PdfEvidence[]
 }
 
 export interface ToolRow {
@@ -46,6 +58,7 @@ export interface ToolRow {
   calibrationExpiry: string
   toolKind: 'standard' | 'special' | 'equivalent' | 'calibration' | ''
   photos: PhotoEvidence[]
+  pdfs?: PdfEvidence[]
 }
 
 export interface MaterialRow {
@@ -54,6 +67,7 @@ export interface MaterialRow {
   partNumberOrReference: string
   equivalent: string
   photos: PhotoEvidence[]
+  pdfs?: PdfEvidence[]
 }
 
 export interface TechnicalDataRow {
@@ -63,6 +77,7 @@ export interface TechnicalDataRow {
   revNumber: string
   revDate: string
   photos: PhotoEvidence[]
+  pdfs?: PdfEvidence[]
 }
 
 export interface ProcessRow {
@@ -72,6 +87,7 @@ export interface ProcessRow {
   revNumber: string
   revDate: string
   photos: PhotoEvidence[]
+  pdfs?: PdfEvidence[]
 }
 
 export interface TrainedPersonnelRow {
@@ -81,6 +97,7 @@ export interface TrainedPersonnelRow {
   specificTraining: string
   compliance: ComplianceStatus
   photos: PhotoEvidence[]
+  pdfs?: PdfEvidence[]
 }
 
 export interface ValidationQuestion {
@@ -89,6 +106,7 @@ export interface ValidationQuestion {
   questionEn: string
   answer: ComplianceStatus
   photos: PhotoEvidence[]
+  pdfs?: PdfEvidence[]
 }
 
 export interface SectionVerify {
@@ -249,39 +267,4 @@ export const PERSONNEL_VALIDATION_QUESTIONS: Pick<ValidationQuestion, 'id' | 'qu
   },
 ]
 
-export const MAX_PHOTOS_PER_ITEM = 5
 export const SCHEMA_VERSION = 1
-
-// ── Shared Evidence Catalog ───────────────────────────────────────────────────
-
-/** Normalize any identifier to a stable match key */
-export function catalogMatchKey(s: string): string {
-  return s.trim().toUpperCase().replace(/\s+/g, ' ')
-}
-
-export interface CatalogTool {
-  matchKey: string
-  description: string
-  partNumber: string
-  photos: PhotoEvidence[]
-}
-
-export interface CatalogMaterial {
-  matchKey: string
-  description: string
-  partNumberOrReference: string
-  photos: PhotoEvidence[]
-}
-
-export interface CatalogPerson {
-  matchKey: string
-  nameAndJobTitle: string
-  licenseNumber: string
-  photos: PhotoEvidence[]
-}
-
-export interface Catalog {
-  tools: CatalogTool[]
-  materials: CatalogMaterial[]
-  personnel: CatalogPerson[]
-}

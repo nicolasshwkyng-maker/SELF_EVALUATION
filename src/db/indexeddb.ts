@@ -1,6 +1,6 @@
 import { openDB, type IDBPDatabase } from 'idb'
 import { v4 as uuidv4 } from 'uuid'
-import type { Inspection, PhotoEvidence, Catalog } from '../types'
+import type { Inspection, PhotoEvidence } from '../types'
 import {
   HOUSING_ITEMS,
   FACILITIES_ITEMS,
@@ -15,7 +15,6 @@ const INSPECTIONS_STORE = 'inspections'
 const PHOTOS_STORE = 'photos_blobs'
 const CATALOG_STORE = 'catalog'
 const CURRENT_KEY = 'current'
-const CATALOG_KEY = 'master'
 
 let dbPromise: Promise<IDBPDatabase> | null = null
 
@@ -36,28 +35,6 @@ function getDB() {
     })
   }
   return dbPromise
-}
-
-export function createEmptyCatalog(): Catalog {
-  return { tools: [], materials: [], personnel: [] }
-}
-
-export async function loadCatalog(): Promise<Catalog> {
-  const db = await getDB()
-  const data = await db.get(CATALOG_STORE, CATALOG_KEY)
-  // Guard against corrupted catalog (e.g. {} without required arrays)
-  const empty = createEmptyCatalog()
-  if (!data) return empty
-  return {
-    tools:      Array.isArray(data.tools)     ? data.tools     : empty.tools,
-    materials:  Array.isArray(data.materials)  ? data.materials  : empty.materials,
-    personnel:  Array.isArray(data.personnel)  ? data.personnel  : empty.personnel,
-  }
-}
-
-export async function saveCatalog(catalog: Catalog): Promise<void> {
-  const db = await getDB()
-  await db.put(CATALOG_STORE, catalog, CATALOG_KEY)
 }
 
 export function createEmptyInspection(): Inspection {

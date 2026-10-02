@@ -34,11 +34,34 @@
   "photo": {
     "camera": "Camera",
     "gallery": "Gallery",
-    "limitReached": "Limit reached — delete a photo to add more",
     "caption": "Caption (optional)",
     "delete": "Delete photo",
     "edit": "Edit caption",
     "save": "Save"
+  },
+
+  "pdf": {
+    "add": "PDF",
+    "processing": "Processing PDF…",
+    "invalid": "Could not read the PDF (is it damaged or password-protected?)",
+    "pages": "{{count}} page",
+    "pages_other": "{{count}} pages",
+    "delete": "Delete PDF",
+    "view": "View PDF",
+    "openOriginal": "Open original"
+  },
+
+  "gallery": {
+    "title": "10. Evidence catalog",
+    "subtitle": "Read-only view of the photos and PDFs attached to this self-evaluation. Add or remove evidence from each item.",
+    "all": "All",
+    "photos": "Photos",
+    "pdfs": "PDF",
+    "pdfPages": "PDF pages",
+    "empty": "No evidence has been attached to this self-evaluation yet.",
+    "emptyFilter": "No evidence of this type.",
+    "goToItem": "Go to item",
+    "close": "Close"
   },
 
   "common": {

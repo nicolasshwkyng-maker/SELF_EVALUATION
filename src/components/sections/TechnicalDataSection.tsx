@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { useInspection } from '../../context/InspectionContext'
 import ComplianceToggle from '../ComplianceToggle'
 import PhotoCapture from '../PhotoCapture'
+import PdfCapture from '../PdfCapture'
 import type { TechnicalDataRow, PhotoEvidence } from '../../types'
 
 function TechCard({ row, index, onChange, onDelete }: {
@@ -70,6 +71,7 @@ function TechCard({ row, index, onChange, onDelete }: {
         </div>
       </div>
       <PhotoCapture photos={row.photos} onChange={(photos: PhotoEvidence[]) => onChange({ ...row, photos })} />
+      <PdfCapture pdfs={row.pdfs ?? []} onChange={(pdfs) => onChange({ ...row, pdfs })} />
     </div>
   )
 }

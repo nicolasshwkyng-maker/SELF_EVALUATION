@@ -1,19 +1,17 @@
-import { Trash2, PlusCircle, Images } from 'lucide-react'
+import { Trash2, PlusCircle } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { v4 as uuidv4 } from 'uuid'
 import { useInspection } from '../../context/InspectionContext'
-import { useCatalog } from '../../context/CatalogContext'
 import ComplianceToggle from '../ComplianceToggle'
 import PhotoCapture from '../PhotoCapture'
+import PdfCapture from '../PdfCapture'
 import type { MaterialRow, PhotoEvidence } from '../../types'
-import { catalogMatchKey } from '../../types'
 
-function MaterialCard({ row, index, onChange, onDelete, catalogPhotoCount }: {
+function MaterialCard({ row, index, onChange, onDelete }: {
   row: MaterialRow
   index: number
   onChange: (r: MaterialRow) => void
   onDelete: () => void
-  catalogPhotoCount: number
 }) {
   const { t } = useTranslation()
 
@@ -22,12 +20,6 @@ function MaterialCard({ row, index, onChange, onDelete, catalogPhotoCount }: {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-sm font-semibold text-slate-700">#{index + 1}</span>
-          {catalogPhotoCount > 0 && (
-            <span className="inline-flex items-center gap-1 bg-amber-100 text-amber-700 text-xs font-semibold px-2 py-0.5 rounded-full">
-              <Images className="w-3 h-3" />
-              {catalogPhotoCount} en catálogo
-            </span>
-          )}
         </div>
         <button type="button" onClick={onDelete} className="text-red-500 hover:text-red-700 p-1">
           <Trash2 className="w-4 h-4" />
@@ -68,6 +60,7 @@ function MaterialCard({ row, index, onChange, onDelete, catalogPhotoCount }: {
         </div>
       </div>
       <PhotoCapture photos={row.photos} onChange={(photos: PhotoEvidence[]) => onChange({ ...row, photos })} />
+      <PdfCapture pdfs={row.pdfs ?? []} onChange={(pdfs) => onChange({ ...row, pdfs })} />
     </div>
   )
 }
@@ -75,7 +68,6 @@ function MaterialCard({ row, index, onChange, onDelete, catalogPhotoCount }: {
 export default function MaterialsSection() {
   const { t } = useTranslation()
   const { inspection, update } = useInspection()
-  const { findMaterialPhotos } = useCatalog()
   if (!inspection) return null
 
   const addRow = () => update((prev) => ({
@@ -94,8 +86,6 @@ export default function MaterialsSection() {
       <h2 className="text-lg font-bold text-slate-800">{t('materials.title')}</h2>
       <div className="space-y-3">
         {inspection.materials.map((row, i) => {
-          const matchKey = catalogMatchKey(row.partNumberOrReference || row.description)
-          const catalogPhotoCount = matchKey ? findMaterialPhotos(matchKey).length : 0
           return (
             <MaterialCard
               key={row.id}
@@ -103,7 +93,6 @@ export default function MaterialsSection() {
               index={i}
               onChange={(r) => updateRow(i, r)}
               onDelete={() => deleteRow(i)}
-              catalogPhotoCount={catalogPhotoCount}
             />
           )
         })}

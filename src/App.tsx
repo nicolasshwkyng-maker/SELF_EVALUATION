@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useInspection } from './context/InspectionContext'
-import { useCatalog } from './context/CatalogContext'
 import Layout from './components/Layout'
 import AdminSection from './components/sections/AdminSection'
 import ComponentSection from './components/sections/ComponentSection'
@@ -33,21 +32,13 @@ export default function App() {
   const [section, setSection] = useState(0)
   const { t } = useTranslation()
   const { loading, setInspection } = useInspection()
-  const { setCatalog, syncFromInspection } = useCatalog()
 
   if (loading) return <LoadingScreen />
 
   const handleImport = async (file: File) => {
     if (!confirm(t('summary.importConfirm'))) return
     try {
-      const { inspection, catalog } = await importFromJson(file)
-      setInspection(inspection)
-      // If the file included a catalog, restore it; otherwise seed catalog from inspection items
-      if (catalog) {
-        setCatalog(catalog)
-      } else {
-        syncFromInspection(inspection)
-      }
+      setInspection(await importFromJson(file))
     } catch (e) {
       alert('Error al importar: ' + String(e))
     }
@@ -65,7 +56,7 @@ export default function App() {
       case 7:  return <ProcessesSection />
       case 8:  return <PersonnelSection />
       case 9:  return <ContractSection />
-      case 10: return <CatalogSection />
+      case 10: return <CatalogSection onSectionChange={setSection} />
       case 11: return <SummarySection onSectionChange={setSection} />
       default: return <AdminSection />
     }
