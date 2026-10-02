@@ -139,24 +139,28 @@ export function drawRowLine(page: PDFPage, y: number, height = 10) {
   page.drawRectangle({ x: MARGIN, y: y - height, width: CONTENT_W, height, borderColor: COLORS.darkGray, borderWidth: 0.3, color: COLORS.white })
 }
 
+export function wrapLines(text: string, font: PDFFont, size: number, maxWidth: number): string[] {
+  const lines: string[] = []
+  let line = ''
+  for (const word of sanitize(text).split(' ')) {
+    const test = line ? `${line} ${word}` : word
+    if (font.widthOfTextAtSize(test, size) > maxWidth && line) {
+      lines.push(line)
+      line = word
+    } else {
+      line = test
+    }
+  }
+  if (line) lines.push(line)
+  return lines
+}
+
 export function drawText(page: PDFPage, text: string, x: number, y: number, size: number, font: PDFFont, color: RGB = COLORS.black, maxWidth?: number) {
   const cleaned = sanitize(text)
   if (maxWidth) {
-    const words = cleaned.split(' ')
-    let line = ''
-    let lineY = y
-    for (const word of words) {
-      const test = line ? `${line} ${word}` : word
-      if (font.widthOfTextAtSize(test, size) > maxWidth && line) {
-        page.drawText(line, { x, y: lineY, size, font, color })
-        line = word
-        lineY -= size + 1.5
-      } else {
-        line = test
-      }
-    }
-    if (line) page.drawText(line, { x, y: lineY, size, font, color })
-    return y - lineY + size
+    const lines = wrapLines(cleaned, font, size, maxWidth)
+    lines.forEach((line, i) => page.drawText(line, { x, y: y - i * (size + 1.5), size, font, color }))
+    return (Math.max(lines.length, 1) - 1) * (size + 1.5) + size
   }
   page.drawText(cleaned, { x, y, size, font, color })
   return size

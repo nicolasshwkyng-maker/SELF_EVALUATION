@@ -3,7 +3,7 @@ import type { PDFPage } from 'pdf-lib'
 import { buildFigureMap } from '../utils/figureNumbering'
 import {
   createPdfCtx, addPage, drawHeaderBox, drawSectionHeader, drawText, drawCompliance,
-  drawVerifyRow, drawDraftWatermark, sanitize,
+  drawVerifyRow, drawDraftWatermark, sanitize, wrapLines,
   MARGIN, CONTENT_W, PAGE_H, HEADER_H, COLORS,
 } from './pdfHelpers'
 import { buildPhotoAnnex } from './photoAnnex'
@@ -338,13 +338,21 @@ export async function exportFormatA(inspection: Inspection, draft: boolean): Pro
   cur.drawText('NO / NO',  { x: pNo + 1,  y: y - 10, size: 4, font: ctx.regular, color: COLORS.black })
   y -= 13
 
+  const perFs = 5.5
+  const perNameW = pLic - pName - 4
+  const perTrainW = pYes - pTrain - 4
   for (const per of inspection.trainedPersonnel) {
-    const rowH = 9
+    const lines = Math.max(
+      wrapLines(per.nameAndJobTitle, ctx.regular, perFs, perNameW).length,
+      wrapLines(per.specificTraining || '', ctx.regular, perFs, perTrainW).length,
+      1,
+    )
+    const rowH = 9 + (lines - 1) * (perFs + 1.5)
     ensure(rowH)
     cur.drawRectangle({ x: MARGIN, y: y - rowH, width: CONTENT_W, height: rowH, borderColor: COLORS.darkGray, borderWidth: 0.2, color: COLORS.white })
-    cur.drawText(sanitize(per.nameAndJobTitle),                      { x: pName + 1,  y: y - 6.5, size: 5.5, font: ctx.regular, color: COLORS.black })
+    drawText(cur, per.nameAndJobTitle,                               pName + 1,  y - 6.5, perFs, ctx.regular, COLORS.black, perNameW)
     cur.drawText(sanitize(per.licenseNumber.slice(0, 15)),           { x: pLic + 1,   y: y - 6.5, size: 5.5, font: ctx.regular, color: COLORS.black })
-    cur.drawText(sanitize((per.specificTraining || '').slice(0, 30)), { x: pTrain + 1, y: y - 6.5, size: 5.5, font: ctx.regular, color: COLORS.black })
+    drawText(cur, per.specificTraining || '',                        pTrain + 1, y - 6.5, perFs, ctx.regular, COLORS.black, perTrainW)
     if (per.compliance === 'yes') cur.drawText('X', { x: pYes + 3, y: y - 6.5, size: 7, font: ctx.bold, color: COLORS.black })
     if (per.compliance === 'no')  cur.drawText('X', { x: pNo + 3,  y: y - 6.5, size: 7, font: ctx.bold, color: COLORS.black })
     y -= rowH
