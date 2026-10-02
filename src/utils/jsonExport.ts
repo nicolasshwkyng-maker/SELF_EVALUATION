@@ -1,4 +1,5 @@
-import type { Inspection, PhotoEvidence, Catalog } from '../types'
+import { v4 as uuidv4 } from 'uuid'
+import type { Inspection, PhotoEvidence, Catalog, ContractMaintenanceService } from '../types'
 import { getAllBlobEntries, saveBlobFromDataUrl, saveBlob } from '../db/indexeddb'
 import { blobToDataUrl } from './imageProcessing'
 import { createEmptyInspection } from '../db/indexeddb'
@@ -111,7 +112,20 @@ export async function importFromJson(file: File): Promise<ImportResult> {
     if (photo.thumbDataUrl) await saveBlobFromDataUrl(photo.thumbnailBlobKey, photo.thumbDataUrl)
   }
 
-  return { inspection: payload.inspection, catalog: payload.catalog ?? null }
+  const rawServices: unknown[] = payload.inspection.contractMaintenance?.services ?? []
+  const services: ContractMaintenanceService[] = rawServices.map((s) =>
+    typeof s === 'string'
+      ? { id: uuidv4(), serviceType: s, standard: '' }
+      : {
+          ...(s as ContractMaintenanceService),
+          id: (s as ContractMaintenanceService).id || uuidv4(),
+          serviceType: (s as ContractMaintenanceService).serviceType ?? '',
+          standard: (s as ContractMaintenanceService).standard ?? '',
+        }
+  )
+  const inspection = { ...payload.inspection, contractMaintenance: { services } }
+
+  return { inspection, catalog: payload.catalog ?? null }
 }
 
 /** Remove / replace characters that are illegal in filenames on any OS. */
