@@ -102,7 +102,9 @@ export default function SummarySection({ onSectionChange }: { onSectionChange: (
     if (!confirm(t('summary.importConfirm'))) return
     setImporting(true)
     try {
-      setInspection(await importFromJson(file))
+      const { inspection, missingFiles } = await importFromJson(file)
+      setInspection(inspection)
+      if (missingFiles.length > 0) alert(`${t('summary.importMissing')}\n\n${missingFiles.join('\n')}`)
     } catch (e) {
       alert('Error al importar: ' + String(e))
     } finally {

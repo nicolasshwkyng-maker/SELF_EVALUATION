@@ -38,7 +38,9 @@ export default function App() {
   const handleImport = async (file: File) => {
     if (!confirm(t('summary.importConfirm'))) return
     try {
-      setInspection(await importFromJson(file))
+      const { inspection, missingFiles } = await importFromJson(file)
+      setInspection(inspection)
+      if (missingFiles.length > 0) alert(`${t('summary.importMissing')}\n\n${missingFiles.join('\n')}`)
     } catch (e) {
       alert('Error al importar: ' + String(e))
     }

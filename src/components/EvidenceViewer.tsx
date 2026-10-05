@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { X, Loader2, ExternalLink, ImageOff } from 'lucide-react'
 import type { PhotoEvidence, PdfEvidence } from '../types'
 import { loadBlob } from '../db/indexeddb'
-import { openStoredPdf, renderPdfPage } from '../utils/pdfEvidence'
+import { openPdf, renderPdfPage } from '../utils/pdfEvidence'
 
 /** Object URL for a stored blob; `null` while loading, `false` if missing. */
 export function useBlobUrl(key: string | undefined): string | null | false {
@@ -112,15 +112,17 @@ export function PdfViewer({ pdf, subtitle, onClose }: { pdf: PdfEvidence; subtit
   const originalUrl = useBlobUrl(pdf.blobKey)
   const containerRef = useRef<HTMLDivElement>(null)
   const [pages, setPages] = useState<string[]>([])
-  const [error, setError] = useState(false)
+  const [error, setError] = useState<false | 'missing' | 'invalid'>(false)
 
   useEffect(() => {
     let cancelled = false
     const urls: string[] = []
     const widthPx = Math.min(containerRef.current?.clientWidth || 900, 1100) * Math.min(window.devicePixelRatio || 1, 2)
     ;(async () => {
-      const doc = await openStoredPdf(pdf).catch(() => null)
-      if (!doc) { if (!cancelled) setError(true); return }
+      const blob = await loadBlob(pdf.blobKey).catch(() => null)
+      if (!blob) { if (!cancelled) setError('missing'); return }
+      const doc = await openPdf(blob).catch(() => null)
+      if (!doc) { if (!cancelled) setError('invalid'); return }
       try {
         for (let p = 1; p <= doc.numPages && !cancelled; p++) {
           const page = await doc.getPage(p)
@@ -132,7 +134,7 @@ export function PdfViewer({ pdf, subtitle, onClose }: { pdf: PdfEvidence; subtit
           setPages([...urls])
         }
       } catch {
-        if (!cancelled) setError(true)
+        if (!cancelled) setError('invalid')
       } finally {
         await doc.destroy()
       }
@@ -172,7 +174,7 @@ export function PdfViewer({ pdf, subtitle, onClose }: { pdf: PdfEvidence; subtit
         {!error && pages.length < pdf.pageCount && (
           <div className="flex justify-center py-6"><Loader2 className="w-8 h-8 text-slate-300 animate-spin" /></div>
         )}
-        {error && <p className="text-center text-sm text-red-300 py-6">{t('pdf.invalid')}</p>}
+        {error && <p className="text-center text-sm text-red-300 py-6">{t(error === 'missing' ? 'pdf.missing' : 'pdf.invalid')}</p>}
       </div>
     </Modal>
   )

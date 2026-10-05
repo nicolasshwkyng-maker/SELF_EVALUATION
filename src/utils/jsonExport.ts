@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 import type { Inspection, PhotoEvidence, PdfEvidence, ContractMaintenanceService } from '../types'
-import { getAllBlobEntries, saveBlobFromDataUrl, saveBlob } from '../db/indexeddb'
+import { getAllBlobEntries, saveBlobFromDataUrl, saveBlob, loadBlob } from '../db/indexeddb'
 import { blobToDataUrl } from './imageProcessing'
 import { createEmptyInspection } from '../db/indexeddb'
 import { listEvidenceItems } from './figureNumbering'
@@ -66,7 +66,26 @@ export async function exportToJson(inspection: Inspection): Promise<void> {
   URL.revokeObjectURL(url)
 }
 
-export async function importFromJson(file: File): Promise<Inspection> {
+export interface ImportResult {
+  inspection: Inspection
+  /** Evidence referenced by the inspection whose file is not on this device after importing. */
+  missingFiles: string[]
+}
+
+async function findMissingEvidence(inspection: Inspection): Promise<string[]> {
+  const missing: string[] = []
+  for (const item of listEvidenceItems(inspection)) {
+    for (const photo of item.photos) {
+      if (!(await loadBlob(photo.blobKey))) missing.push(`${item.sectionLabel} — foto ${photo.caption || photo.id.slice(0, 8)}`)
+    }
+    for (const pdf of item.pdfs) {
+      if (!(await loadBlob(pdf.blobKey))) missing.push(`${item.sectionLabel} — ${pdf.fileName}`)
+    }
+  }
+  return missing
+}
+
+export async function importFromJson(file: File): Promise<ImportResult> {
   let text: string
   try {
     text = await file.text()
@@ -93,7 +112,8 @@ export async function importFromJson(file: File): Promise<Inspection> {
           standard: (s as ContractMaintenanceService).standard ?? '',
         }
   )
-  return { ...payload.inspection, contractMaintenance: { services } }
+  const inspection = { ...payload.inspection, contractMaintenance: { services } }
+  return { inspection, missingFiles: await findMissingEvidence(inspection) }
 }
 
 /** Remove / replace characters that are illegal in filenames on any OS. */
