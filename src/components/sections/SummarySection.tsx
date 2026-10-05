@@ -4,7 +4,6 @@ import { FileText, Download, Upload, PlusCircle, AlertTriangle, CheckCircle, Fil
 import { useInspection } from '../../context/InspectionContext'
 import { exportToJson, importFromJson, triggerPdfDownload, safeFilename } from '../../utils/jsonExport'
 import { exportFormatA } from '../../pdf/exportFormatA'
-import { exportFormatB } from '../../pdf/exportFormatB'
 import { deleteInspection, createEmptyInspection } from '../../db/indexeddb'
 import { listEvidenceItems } from '../../utils/figureNumbering'
 import { exportWarehouseExcel } from '../../utils/warehouseExcel'
@@ -54,7 +53,6 @@ function countPdfs(inspection: NonNullable<ReturnType<typeof useInspection>['ins
 export default function SummarySection({ onSectionChange }: { onSectionChange: (i: number) => void }) {
   const { t } = useTranslation()
   const { inspection, update, setInspection } = useInspection()
-  const [pdfFormat, setPdfFormat] = useState<'A' | 'B'>('A')
   const [showWarnings, setShowWarnings] = useState(false)
   const [exporting, setExporting] = useState(false)
   const [importing, setImporting] = useState(false)
@@ -71,9 +69,7 @@ export default function SummarySection({ onSectionChange }: { onSectionChange: (
     setExporting(true)
     setShowWarnings(false)
     try {
-      const bytes = pdfFormat === 'A'
-        ? await exportFormatA(inspection, draft)
-        : await exportFormatB(inspection, draft)
+      const bytes = await exportFormatA(inspection, draft)
       const partNumber = safeFilename(inspection.componentId.partNumber.trim())
       triggerPdfDownload(bytes, `SAT-F743 - ${partNumber}.pdf`)
     } catch (e) {
@@ -183,25 +179,6 @@ export default function SummarySection({ onSectionChange }: { onSectionChange: (
           rows={4}
           className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-y"
         />
-      </div>
-
-      {/* PDF Format */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4">
-        <p className="text-sm font-semibold text-slate-700 mb-3">{t('summary.pdfFormat')}</p>
-        <div className="space-y-2">
-          {(['A', 'B'] as const).map((f) => (
-            <label key={f} className="flex items-center gap-3 cursor-pointer">
-              <input
-                type="radio"
-                value={f}
-                checked={pdfFormat === f}
-                onChange={() => setPdfFormat(f)}
-                className="w-4 h-4 text-blue-600"
-              />
-              <span className="text-sm text-slate-700">{t(`summary.format${f}`)}</span>
-            </label>
-          ))}
-        </div>
       </div>
 
       {/* Export PDF */}

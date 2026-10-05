@@ -55,7 +55,7 @@ export function listEvidenceItems(inspection: Inspection): EvidenceItem[] {
   return items
 }
 
-export function pdfPageCaption(pdf: PdfEvidence, pageNumber: number): string {
+function pdfPageCaption(pdf: PdfEvidence, pageNumber: number): string {
   const base = pdf.caption ? `${pdf.caption} - ${pdf.fileName}` : pdf.fileName
   return `${base} (Pag. ${pageNumber}/${pdf.pageCount})`
 }
