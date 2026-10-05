@@ -1,12 +1,13 @@
 import { useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { FileText, Download, Upload, PlusCircle, AlertTriangle, CheckCircle } from 'lucide-react'
+import { FileText, Download, Upload, PlusCircle, AlertTriangle, CheckCircle, FileSpreadsheet } from 'lucide-react'
 import { useInspection } from '../../context/InspectionContext'
 import { exportToJson, importFromJson, triggerPdfDownload, safeFilename } from '../../utils/jsonExport'
 import { exportFormatA } from '../../pdf/exportFormatA'
 import { exportFormatB } from '../../pdf/exportFormatB'
 import { deleteInspection, createEmptyInspection } from '../../db/indexeddb'
 import { listEvidenceItems } from '../../utils/figureNumbering'
+import { exportWarehouseExcel } from '../../utils/warehouseExcel'
 
 function getWarnings(inspection: ReturnType<typeof useInspection>['inspection']): string[] {
   if (!inspection) return []
@@ -57,6 +58,7 @@ export default function SummarySection({ onSectionChange }: { onSectionChange: (
   const [showWarnings, setShowWarnings] = useState(false)
   const [exporting, setExporting] = useState(false)
   const [importing, setImporting] = useState(false)
+  const [exportingXlsx, setExportingXlsx] = useState(false)
   const importRef = useRef<HTMLInputElement>(null)
 
   if (!inspection) return null
@@ -95,6 +97,18 @@ export default function SummarySection({ onSectionChange }: { onSectionChange: (
       await exportToJson(inspection)
     } catch (e) {
       console.error('JSON export error:', e)
+    }
+  }
+
+  const handleExportWarehouse = async () => {
+    setExportingXlsx(true)
+    try {
+      await exportWarehouseExcel(inspection)
+    } catch (e) {
+      console.error('Warehouse Excel export error:', e)
+      alert(t('summary.exportWarehouseError'))
+    } finally {
+      setExportingXlsx(false)
     }
   }
 
@@ -252,6 +266,19 @@ export default function SummarySection({ onSectionChange }: { onSectionChange: (
           {importing ? 'Importando...' : t('summary.importJson')}
         </button>
       </div>
+      <button
+        type="button"
+        onClick={handleExportWarehouse}
+        disabled={exportingXlsx || inspection.tools.length + inspection.materials.length === 0}
+        title={inspection.tools.length + inspection.materials.length === 0 ? t('summary.warehouseEmpty') : undefined}
+        className="w-full flex items-center justify-center gap-2 border border-emerald-600 text-emerald-700 py-2.5 rounded-xl text-sm font-medium hover:bg-emerald-50 disabled:opacity-50 transition-colors"
+      >
+        <FileSpreadsheet className="w-4 h-4" />
+        {exportingXlsx ? t('summary.exportingWarehouse') : t('summary.exportWarehouse')}
+        <span className="text-xs text-emerald-600/80 tabular-nums">
+          ({inspection.tools.length} + {inspection.materials.length})
+        </span>
+      </button>
       <input
         ref={importRef}
         type="file"
