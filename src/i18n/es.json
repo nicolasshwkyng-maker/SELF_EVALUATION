@@ -121,6 +121,11 @@
       "equivalent": "Equivalente",
       "calibration": "Calibración"
     },
+    "filter": {
+      "all": "Todas",
+      "none": "Sin tipo",
+      "empty": "No hay herramientas de este tipo."
+    },
     "addTool": "Agregar herramienta",
     "sectionVerify": "Verificado sección 3",
     "validation": {

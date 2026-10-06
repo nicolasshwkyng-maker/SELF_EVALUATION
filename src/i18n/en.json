@@ -121,6 +121,11 @@
       "equivalent": "Equivalent",
       "calibration": "Calibration"
     },
+    "filter": {
+      "all": "All",
+      "none": "No kind",
+      "empty": "No tools of this kind."
+    },
     "addTool": "Add tool",
     "sectionVerify": "Verify section 3",
     "validation": {

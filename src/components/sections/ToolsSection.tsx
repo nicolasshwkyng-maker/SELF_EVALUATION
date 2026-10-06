@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Trash2, PlusCircle } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { v4 as uuidv4 } from 'uuid'
@@ -8,6 +9,8 @@ import PdfCapture from '../PdfCapture'
 import type { ToolRow, ValidationQuestion, PhotoEvidence } from '../../types'
 
 const TOOL_KINDS = ['', 'standard', 'special', 'equivalent', 'calibration'] as const
+type KindFilter = 'all' | ToolRow['toolKind']
+type FilterOption = { id: KindFilter; label: string; count: number }
 
 function ToolCard({ row, index, onChange, onDelete }: {
   row: ToolRow
@@ -115,12 +118,27 @@ function ValidationCard({ q, onChange }: {
 export default function ToolsSection() {
   const { t } = useTranslation()
   const { inspection, update } = useInspection()
+  const [kindFilter, setKindFilter] = useState<KindFilter>('all')
   if (!inspection) return null
 
-  const addTool = () => update((prev) => ({
+  const kindCount = (k: ToolRow['toolKind']) => inspection.tools.filter((tool) => (tool.toolKind || '') === k).length
+  const allOptions: FilterOption[] = [
+    { id: 'all', label: t('tools.filter.all'), count: inspection.tools.length },
+    ...TOOL_KINDS.filter((k) => k !== '').map((k): FilterOption => ({ id: k, label: t(`tools.kinds.${k}`), count: kindCount(k) })),
+    { id: '', label: t('tools.filter.none'), count: kindCount('') },
+  ]
+  const filterOptions = allOptions.filter((o) => o.id !== '' || o.count > 0 || kindFilter === '')
+  const visibleTools = inspection.tools
+    .map((row, i) => ({ row, i }))
+    .filter(({ row }) => kindFilter === 'all' || (row.toolKind || '') === kindFilter)
+
+  const addTool = () => {
+    setKindFilter('all')
+    update((prev) => ({
     ...prev,
-    tools: [...prev.tools, { id: uuidv4(), description: '', partNumber: '', serialNumber: '', calibrationExpiry: '', toolKind: '', photos: [] }],
-  }))
+      tools: [...prev.tools, { id: uuidv4(), description: '', partNumber: '', serialNumber: '', calibrationExpiry: '', toolKind: '', photos: [] }],
+    }))
+  }
 
   const updateTool = (i: number, row: ToolRow) =>
     update((prev) => { const tools = [...prev.tools]; tools[i] = row; return { ...prev, tools } })
@@ -135,18 +153,42 @@ export default function ToolsSection() {
     <div className="space-y-4">
       <h2 className="text-lg font-bold text-slate-800">{t('tools.title')}</h2>
 
+      {inspection.tools.length > 0 && (
+        <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1" role="tablist" aria-label={t('tools.toolKind')}>
+          {filterOptions.map(({ id, label, count }) => {
+            const active = kindFilter === id
+            return (
+              <button
+                key={id || 'none'}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                onClick={() => setKindFilter(id)}
+                className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 ${
+                  active ? 'bg-blue-600 border-blue-600 text-white' : 'bg-white border-gray-300 text-slate-600 hover:border-blue-400'
+                }`}
+              >
+                {label}
+                <span className={`text-xs tabular-nums ${active ? 'text-blue-100' : 'text-gray-400'}`}>{count}</span>
+              </button>
+            )
+          })}
+        </div>
+      )}
+
       <div className="space-y-3">
-        {inspection.tools.map((row, i) => {
-          return (
-            <ToolCard
-              key={row.id}
-              row={row}
-              index={i}
-              onChange={(r) => updateTool(i, r)}
-              onDelete={() => deleteTool(i)}
-            />
-          )
-        })}
+        {visibleTools.map(({ row, i }) => (
+          <ToolCard
+            key={row.id}
+            row={row}
+            index={i}
+            onChange={(r) => updateTool(i, r)}
+            onDelete={() => deleteTool(i)}
+          />
+        ))}
+        {inspection.tools.length > 0 && visibleTools.length === 0 && (
+          <p className="text-center text-sm text-gray-400 py-6">{t('tools.filter.empty')}</p>
+        )}
       </div>
 
       <button
