@@ -7,6 +7,7 @@ import { exportFormatA } from '../../pdf/exportFormatA'
 import { deleteInspection, createEmptyInspection } from '../../db/indexeddb'
 import { listEvidenceItems } from '../../utils/figureNumbering'
 import { exportWarehouseExcel } from '../../utils/warehouseExcel'
+import { isReloadingForUpdate } from '../../utils/appUpdate'
 
 function getWarnings(inspection: ReturnType<typeof useInspection>['inspection']): string[] {
   if (!inspection) return []
@@ -74,7 +75,7 @@ export default function SummarySection({ onSectionChange }: { onSectionChange: (
       triggerPdfDownload(bytes, `SAT-F743 - ${partNumber}.pdf`)
     } catch (e) {
       console.error('PDF export error:', e)
-      alert('Error al exportar PDF. Inténtalo de nuevo.')
+      if (!isReloadingForUpdate()) alert('Error al exportar PDF. Inténtalo de nuevo.')
     } finally {
       setExporting(false)
     }
@@ -102,7 +103,7 @@ export default function SummarySection({ onSectionChange }: { onSectionChange: (
       await exportWarehouseExcel(inspection)
     } catch (e) {
       console.error('Warehouse Excel export error:', e)
-      alert(t('summary.exportWarehouseError'))
+      if (!isReloadingForUpdate()) alert(t('summary.exportWarehouseError'))
     } finally {
       setExportingXlsx(false)
     }

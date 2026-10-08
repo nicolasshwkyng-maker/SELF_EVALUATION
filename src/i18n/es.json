@@ -1,6 +1,9 @@
 {
   "appName": "SAT-F743 Evaluación de Capacidades",
   "appShort": "SAT-F743",
+  "app": {
+    "updateReload": "Hay una versión nueva de la app. Se va a recargar para actualizarse; luego vuelve a intentar la acción."
+  },
   "lang": "ES",
   "langToggle": "EN",
 

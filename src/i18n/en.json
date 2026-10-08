@@ -1,6 +1,9 @@
 {
   "appName": "SAT-F743 Maintenance Capabilities Evaluation",
   "appShort": "SAT-F743",
+  "app": {
+    "updateReload": "A new version of the app is available. It will reload to update; then try the action again."
+  },
   "lang": "EN",
   "langToggle": "ES",
 

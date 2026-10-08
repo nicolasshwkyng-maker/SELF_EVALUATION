@@ -5,6 +5,7 @@ import type { PdfEvidence } from '../types'
 import { deleteBlob } from '../db/indexeddb'
 import { isPdfFile, processPdfFile } from '../utils/pdfEvidence'
 import { BlobThumb, PdfViewer } from './EvidenceViewer'
+import { isReloadingForUpdate } from '../utils/appUpdate'
 
 interface Props {
   pdfs: PdfEvidence[]
@@ -94,7 +95,7 @@ export default function PdfCapture({ pdfs, onChange }: Props) {
         }
       }
       if (added.length > 0) onChange([...pdfs, ...added])
-      if (failed.length > 0) alert(`${t('pdf.invalid')}\n\n${failed.join('\n')}`)
+      if (failed.length > 0 && !isReloadingForUpdate()) alert(`${t('pdf.invalid')}\n\n${failed.join('\n')}`)
     } finally {
       setProcessing(false)
       if (inputRef.current) inputRef.current.value = ''
