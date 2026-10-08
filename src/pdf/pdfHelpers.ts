@@ -141,10 +141,19 @@ export function drawRowLine(page: PDFPage, y: number, height = 10) {
 
 export function wrapLines(text: string, font: PDFFont, size: number, maxWidth: number): string[] {
   const lines: string[] = []
+  const fits = (s: string) => font.widthOfTextAtSize(s, size) <= maxWidth
   let line = ''
-  for (const word of sanitize(text).split(' ')) {
+  for (let word of sanitize(text).split(' ')) {
+    // Hard-break tokens wider than the column (long P/Ns or references without spaces).
+    while (!fits(word) && word.length > 1) {
+      if (line) { lines.push(line); line = '' }
+      let n = word.length - 1
+      while (n > 1 && !fits(word.slice(0, n))) n--
+      lines.push(word.slice(0, n))
+      word = word.slice(n)
+    }
     const test = line ? `${line} ${word}` : word
-    if (font.widthOfTextAtSize(test, size) > maxWidth && line) {
+    if (!fits(test) && line) {
       lines.push(line)
       line = word
     } else {

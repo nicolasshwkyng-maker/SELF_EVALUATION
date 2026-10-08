@@ -54,6 +54,17 @@ export async function exportFormatA(inspection: Inspection, draft: boolean): Pro
     }
   }
 
+  const CELL_FS = 5.5
+  type RowCell = { text: string; x: number; w: number }
+  const cell = (text: string, x: number, nextX: number): RowCell => ({ text, x: x + 1, w: nextX - x - 4 })
+  const rowHeight = (cells: RowCell[]) =>
+    9 + (Math.max(1, ...cells.map((c) => wrapLines(c.text, ctx.regular, CELL_FS, c.w).length)) - 1) * (CELL_FS + 1.5)
+  function drawRow(cells: RowCell[], rowH: number) {
+    cur.drawRectangle({ x: MARGIN, y: y - rowH, width: CONTENT_W, height: rowH, borderColor: COLORS.darkGray, borderWidth: 0.2, color: COLORS.white })
+    for (const c of cells) drawText(cur, c.text, c.x, y - 6.5, CELL_FS, ctx.regular, COLORS.black, c.w)
+    y -= rowH
+  }
+
   // ── PAGE 1 ──────────────────────────────────────────────────────────────
   cur = newPage()
   y = PAGE_H - MARGIN - HEADER_H - 3
@@ -181,7 +192,14 @@ export async function exportFormatA(inspection: Inspection, draft: boolean): Pro
   y = drawToolsTableHeader(cur, y)
 
   for (const tool of inspection.tools) {
-    const rowH = 9
+    const cells = [
+      cell(tool.description, tDesc, tPn),
+      cell(tool.partNumber, tPn, tSn),
+      cell(tool.serialNumber || 'N/A', tSn, tCal),
+      cell(tool.calibrationExpiry ? formatDate(tool.calibrationExpiry) : 'N/A', tCal, tKind),
+      cell((tool.toolKind || '').toUpperCase(), tKind, MARGIN + CONTENT_W),
+    ]
+    const rowH = rowHeight(cells)
     if (y - rowH < MIN_Y) {
       cur = newPage()
       y = PAGE_H - MARGIN - HEADER_H - 3
@@ -189,13 +207,7 @@ export async function exportFormatA(inspection: Inspection, draft: boolean): Pro
       y -= 2
       y = drawToolsTableHeader(cur, y)
     }
-    cur.drawRectangle({ x: MARGIN, y: y - rowH, width: CONTENT_W, height: rowH, borderColor: COLORS.darkGray, borderWidth: 0.2, color: COLORS.white })
-    cur.drawText(sanitize(tool.description.slice(0, 38)),                              { x: tDesc + 1, y: y - 6.5, size: 5.5, font: ctx.regular, color: COLORS.black })
-    cur.drawText(sanitize(tool.partNumber.slice(0, 20)),                               { x: tPn + 1,   y: y - 6.5, size: 5.5, font: ctx.regular, color: COLORS.black })
-    cur.drawText(sanitize((tool.serialNumber || 'N/A').slice(0, 10)),                  { x: tSn + 1,   y: y - 6.5, size: 5.5, font: ctx.regular, color: COLORS.black })
-    cur.drawText(sanitize(tool.calibrationExpiry ? formatDate(tool.calibrationExpiry) : 'N/A'), { x: tCal + 1, y: y - 6.5, size: 5.5, font: ctx.regular, color: COLORS.black })
-    cur.drawText(sanitize((tool.toolKind || '').toUpperCase()),                        { x: tKind + 1, y: y - 6.5, size: 5.5, font: ctx.regular, color: COLORS.black })
-    y -= rowH
+    drawRow(cells, rowH)
   }
   ensure(13)
   y = drawVerifyRow(cur, ctx, y, inspection.sectionVerify.tools)
@@ -246,7 +258,12 @@ export async function exportFormatA(inspection: Inspection, draft: boolean): Pro
   y = drawMaterialsTableHeader(cur, y)
 
   for (const mat of inspection.materials) {
-    const rowH = 9
+    const cells = [
+      cell(mat.description, mDesc, mPn),
+      cell(mat.partNumberOrReference, mPn, mEq),
+      cell(mat.equivalent || '', mEq, MARGIN + CONTENT_W),
+    ]
+    const rowH = rowHeight(cells)
     if (y - rowH < MIN_Y) {
       cur = newPage()
       y = PAGE_H - MARGIN - HEADER_H - 3
@@ -254,11 +271,7 @@ export async function exportFormatA(inspection: Inspection, draft: boolean): Pro
       y -= 2
       y = drawMaterialsTableHeader(cur, y)
     }
-    cur.drawRectangle({ x: MARGIN, y: y - rowH, width: CONTENT_W, height: rowH, borderColor: COLORS.darkGray, borderWidth: 0.2, color: COLORS.white })
-    cur.drawText(sanitize(mat.description.slice(0, 35)),              { x: mDesc + 1, y: y - 6.5, size: 5.5, font: ctx.regular, color: COLORS.black })
-    cur.drawText(sanitize(mat.partNumberOrReference.slice(0, 25)),    { x: mPn + 1,   y: y - 6.5, size: 5.5, font: ctx.regular, color: COLORS.black })
-    cur.drawText(sanitize((mat.equivalent || '').slice(0, 20)),       { x: mEq + 1,   y: y - 6.5, size: 5.5, font: ctx.regular, color: COLORS.black })
-    y -= rowH
+    drawRow(cells, rowH)
   }
   ensure(13)
   y = drawVerifyRow(cur, ctx, y, inspection.sectionVerify.materials)
@@ -281,14 +294,15 @@ export async function exportFormatA(inspection: Inspection, draft: boolean): Pro
   y -= 13
 
   for (const td of inspection.technicalData) {
-    const rowH = 9
+    const cells = [
+      cell(td.publicationDescription, tdType, tdRef),
+      cell(td.reference, tdRef, tdRev),
+      cell(td.revNumber || '', tdRev, tdDate),
+      cell(td.revDate ? formatDate(td.revDate) : '', tdDate, MARGIN + CONTENT_W),
+    ]
+    const rowH = rowHeight(cells)
     ensure(rowH)
-    cur.drawRectangle({ x: MARGIN, y: y - rowH, width: CONTENT_W, height: rowH, borderColor: COLORS.darkGray, borderWidth: 0.2, color: COLORS.white })
-    cur.drawText(sanitize(td.publicationDescription.slice(0, 30)), { x: tdType + 1, y: y - 6.5, size: 5.5, font: ctx.regular, color: COLORS.black })
-    cur.drawText(sanitize(td.reference.slice(0, 20)),              { x: tdRef + 1,  y: y - 6.5, size: 5.5, font: ctx.regular, color: COLORS.black })
-    cur.drawText(sanitize(td.revNumber || ''),                     { x: tdRev + 1,  y: y - 6.5, size: 5.5, font: ctx.regular, color: COLORS.black })
-    cur.drawText(sanitize(td.revDate ? formatDate(td.revDate) : ''), { x: tdDate + 1, y: y - 6.5, size: 5.5, font: ctx.regular, color: COLORS.black })
-    y -= rowH
+    drawRow(cells, rowH)
   }
   ensure(13)
   y = drawVerifyRow(cur, ctx, y, inspection.sectionVerify.technicalData)
@@ -311,14 +325,15 @@ export async function exportFormatA(inspection: Inspection, draft: boolean): Pro
   y -= 13
 
   for (const pr of inspection.processes) {
-    const rowH = 9
+    const cells = [
+      cell(pr.processName, prName, prId),
+      cell(pr.reference, prId, prRev),
+      cell(pr.revNumber || '', prRev, prDate),
+      cell(pr.revDate ? formatDate(pr.revDate) : '', prDate, MARGIN + CONTENT_W),
+    ]
+    const rowH = rowHeight(cells)
     ensure(rowH)
-    cur.drawRectangle({ x: MARGIN, y: y - rowH, width: CONTENT_W, height: rowH, borderColor: COLORS.darkGray, borderWidth: 0.2, color: COLORS.white })
-    cur.drawText(sanitize(pr.processName.slice(0, 30)), { x: prName + 1, y: y - 6.5, size: 5.5, font: ctx.regular, color: COLORS.black })
-    cur.drawText(sanitize(pr.reference.slice(0, 20)),   { x: prId + 1,   y: y - 6.5, size: 5.5, font: ctx.regular, color: COLORS.black })
-    cur.drawText(sanitize(pr.revNumber || ''),          { x: prRev + 1,  y: y - 6.5, size: 5.5, font: ctx.regular, color: COLORS.black })
-    cur.drawText(sanitize(pr.revDate ? formatDate(pr.revDate) : ''), { x: prDate + 1, y: y - 6.5, size: 5.5, font: ctx.regular, color: COLORS.black })
-    y -= rowH
+    drawRow(cells, rowH)
   }
   ensure(13)
   y = drawVerifyRow(cur, ctx, y, inspection.sectionVerify.processes)
@@ -349,9 +364,11 @@ export async function exportFormatA(inspection: Inspection, draft: boolean): Pro
   const perFs = 5.5
   const perNameW = pLic - pName - 4
   const perTrainW = pYes - pTrain - 4
+  const perLicW = pTrain - pLic - 4
   for (const per of inspection.trainedPersonnel) {
     const lines = Math.max(
       wrapLines(per.nameAndJobTitle, ctx.regular, perFs, perNameW).length,
+      wrapLines(per.licenseNumber, ctx.regular, perFs, perLicW).length,
       wrapLines(per.specificTraining || '', ctx.regular, perFs, perTrainW).length,
       1,
     )
@@ -359,7 +376,7 @@ export async function exportFormatA(inspection: Inspection, draft: boolean): Pro
     ensure(rowH)
     cur.drawRectangle({ x: MARGIN, y: y - rowH, width: CONTENT_W, height: rowH, borderColor: COLORS.darkGray, borderWidth: 0.2, color: COLORS.white })
     drawText(cur, per.nameAndJobTitle,                               pName + 1,  y - 6.5, perFs, ctx.regular, COLORS.black, perNameW)
-    cur.drawText(sanitize(per.licenseNumber.slice(0, 15)),           { x: pLic + 1,   y: y - 6.5, size: 5.5, font: ctx.regular, color: COLORS.black })
+    drawText(cur, per.licenseNumber,                                 pLic + 1,   y - 6.5, perFs, ctx.regular, COLORS.black, perLicW)
     drawText(cur, per.specificTraining || '',                        pTrain + 1, y - 6.5, perFs, ctx.regular, COLORS.black, perTrainW)
     if (per.compliance === 'yes') cur.drawText('X', { x: pYes + 3, y: y - 6.5, size: 7, font: ctx.bold, color: COLORS.black })
     if (per.compliance === 'no')  cur.drawText('X', { x: pNo + 3,  y: y - 6.5, size: 7, font: ctx.bold, color: COLORS.black })
@@ -416,12 +433,10 @@ export async function exportFormatA(inspection: Inspection, draft: boolean): Pro
     y -= 9
   } else {
     for (const svc of services) {
-      const rowH = 9
+      const cells = [cell(svc.serviceType, ctSvc + 1, ctStd), cell(svc.standard, ctStd + 1, MARGIN + CONTENT_W)]
+      const rowH = rowHeight(cells)
       ensure(rowH)
-      cur.drawRectangle({ x: MARGIN, y: y - rowH, width: CONTENT_W, height: rowH, borderColor: COLORS.darkGray, borderWidth: 0.2, color: COLORS.white })
-      cur.drawText(sanitize(svc.serviceType.slice(0, 45)), { x: ctSvc + 2, y: y - 6.5, size: 5.5, font: ctx.regular, color: COLORS.black })
-      cur.drawText(sanitize(svc.standard.slice(0, 35)),    { x: ctStd + 2, y: y - 6.5, size: 5.5, font: ctx.regular, color: COLORS.black })
-      y -= rowH
+      drawRow(cells, rowH)
     }
   }
   y -= 4
