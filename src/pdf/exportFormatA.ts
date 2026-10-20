@@ -481,10 +481,8 @@ export async function exportFormatA(inspection: Inspection, draft: boolean): Pro
   if (inspection.signatures?.qualityControlApproved === 'no') cur.drawText('X', { x: sig2x + 37, y: y - 46, size: 7, font: ctx.bold, color: COLORS.black })
   cur.drawText('NO / NO', { x: sig2x + 45, y: y - 46, size: 5.5, font: ctx.regular, color: COLORS.black })
   cur.drawText('SIGNATURE / FIRMA:', { x: sig2x + 2, y: y - 56, size: 5, font: ctx.bold, color: COLORS.black })
-  // DATE/FECHA en la misma línea — valor = fecha auditoría QA − 3 días
-  const qcDate = new Date(); qcDate.setDate(qcDate.getDate() - 3)
   cur.drawText('DATE / FECHA:', { x: sig2x + 55, y: y - 56, size: 5, font: ctx.bold, color: COLORS.black })
-  cur.drawText(formatDate(qcDate.toISOString()), { x: sig2x + 93, y: y - 56, size: 5, font: ctx.regular, color: COLORS.black })
+  cur.drawText(formatDate(inspection.signatures?.qualityControlDate ?? ''), { x: sig2x + 93, y: y - 56, size: 5, font: ctx.regular, color: COLORS.black })
   y -= 68
 
   // Quality Assurance audit box (full width)
@@ -502,7 +500,7 @@ export async function exportFormatA(inspection: Inspection, draft: boolean): Pro
   if (inspection.signatures?.qualityAssuranceApproved === 'no') cur.drawText('X', { x: MARGIN + 52, y: y - 48, size: 8, font: ctx.bold, color: COLORS.black })
   cur.drawText('NO / NO', { x: MARGIN + 63, y: y - 47, size: 6, font: ctx.regular, color: COLORS.black })
   cur.drawText('DATE / FECHA:', { x: MARGIN + 3, y: y - 62, size: 5.5, font: ctx.bold, color: COLORS.black })
-  cur.drawText(formatDate(new Date().toISOString()), { x: MARGIN + 50, y: y - 62, size: 6, font: ctx.regular, color: COLORS.black })
+  cur.drawText(formatDate(inspection.signatures?.qualityAssuranceDate ?? ''), { x: MARGIN + 50, y: y - 62, size: 6, font: ctx.regular, color: COLORS.black })
   cur.drawText('SIGNATURE / FIRMA:', { x: MARGIN + 3, y: y - 75, size: 5.5, font: ctx.bold, color: COLORS.black })
 
   bodyPages.forEach((pg) => {

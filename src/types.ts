@@ -134,8 +134,10 @@ export interface Signatures {
   maintenanceApproved: ComplianceStatus
   qualityControlResponsibleName: string
   qualityControlApproved: ComplianceStatus
+  qualityControlDate?: string
   qualityAssuranceName: string
   qualityAssuranceApproved: ComplianceStatus
+  qualityAssuranceDate?: string
 }
 
 export interface Inspection {

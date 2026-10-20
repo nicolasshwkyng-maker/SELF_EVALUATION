@@ -104,8 +104,10 @@ export function createEmptyInspection(): Inspection {
       maintenanceApproved: null,
       qualityControlResponsibleName: '',
       qualityControlApproved: null,
+      qualityControlDate: '',
       qualityAssuranceName: '',
       qualityAssuranceApproved: null,
+      qualityAssuranceDate: '',
     },
     observations: '',
   }

@@ -162,6 +162,15 @@ export default function ContractSection() {
                 showNa={false}
               />
             </div>
+            <label className="flex items-center gap-2 mt-1">
+              <span className="text-xs text-gray-500">Fecha / Date</span>
+              <input
+                type="date"
+                value={signatures.qualityControlDate ?? ''}
+                onChange={(e) => setSig('qualityControlDate', e.target.value)}
+                className="border border-gray-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+            </label>
           </div>
         </div>
       </div>
@@ -195,6 +204,15 @@ export default function ContractSection() {
                 showNa={false}
               />
             </div>
+            <label className="flex items-center gap-2 mt-1">
+              <span className="text-xs text-gray-500">Fecha / Date</span>
+              <input
+                type="date"
+                value={signatures.qualityAssuranceDate ?? ''}
+                onChange={(e) => setSig('qualityAssuranceDate', e.target.value)}
+                className="border border-gray-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+            </label>
           </div>
         </div>
       </div>
