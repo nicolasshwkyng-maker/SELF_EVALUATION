@@ -7,6 +7,9 @@ const THUMB_WIDTH_PX = 400
 /** Long-edge size for pages rasterized into the exported report (≈ 200 DPI on Letter). */
 export const EXPORT_PAGE_MAX_PX = 2200
 
+/** Decoders and fonts served by the `pdfjsAssets` Vite plugin. */
+const PDFJS_ASSETS = `${import.meta.env.BASE_URL}pdfjs/`
+
 let pdfjsPromise: Promise<typeof import('pdfjs-dist/legacy/build/pdf.mjs')> | null = null
 
 function loadPdfjs() {
@@ -29,7 +32,11 @@ export function isPdfFile(file: File): boolean {
 export async function openPdf(blob: Blob): Promise<PDFDocumentProxy> {
   const pdfjs = await loadPdfjs()
   const data = new Uint8Array(await blob.arrayBuffer())
-  return pdfjs.getDocument({ data }).promise
+  return pdfjs.getDocument({
+    data,
+    wasmUrl: `${PDFJS_ASSETS}wasm/`,
+    standardFontDataUrl: `${PDFJS_ASSETS}standard_fonts/`,
+  }).promise
 }
 
 export async function openStoredPdf(pdf: PdfEvidence): Promise<PDFDocumentProxy | null> {
