@@ -89,8 +89,13 @@ export async function importFromJson(file: File): Promise<ImportResult> {
   let text: string
   try {
     text = await file.text()
-  } catch {
-    throw new Error('No se pudo leer el archivo. Asegúrese de que esté descargado localmente (no solo en la nube).')
+  } catch (e) {
+    // NotReadableError: the file changed after it was picked, is cloud-only, or the OS blocked access.
+    const reason = e instanceof DOMException ? e.name : String(e)
+    throw new Error(
+      'No se pudo leer el archivo. Asegúrese de que esté descargado localmente (no solo en la nube) y que no se haya modificado después de seleccionarlo; ' +
+      `si persiste, duplíquelo en el Finder (Cmd+D) y cargue la copia. [${reason}]`,
+    )
   }
 
   const payload = JSON.parse(text) as ExportPayload
