@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useInspection } from './context/InspectionContext'
 import Layout from './components/Layout'
+import UpdateBanner from './components/UpdateBanner'
 import AdminSection from './components/sections/AdminSection'
 import ComponentSection from './components/sections/ComponentSection'
 import HousingSection from './components/sections/HousingSection'
@@ -67,6 +68,7 @@ export default function App() {
   return (
     <Layout currentSection={section} onSectionChange={setSection} onImport={handleImport}>
       {renderSection()}
+      <UpdateBanner />
     </Layout>
   )
 }
