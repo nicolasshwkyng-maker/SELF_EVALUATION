@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+.vercel
+
+# Script local de despliegue (contiene credenciales) — nunca al repo
+deploy.sh

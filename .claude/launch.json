@@ -3,7 +3,7 @@
   "configurations": [
     {
       "name": "sat-f743",
-      "runtimeExecutable": "npm",
+      "runtimeExecutable": "/Users/ludwinshwkyng/.nvm/versions/node/v24.18.0/bin/npm",
       "runtimeArgs": ["run", "dev"],
       "port": 5173
     }
